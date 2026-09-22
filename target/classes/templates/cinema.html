@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<!-- 声明文档类型为 HTML5 -->
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<!-- 设置网页语言为中文，声明 Thymeleaf 命名空间 -->
+<head>
+    <!-- 设置字符编码为 UTF-8 -->
+    <meta charset="UTF-8">
+    <!-- 设置视口 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 网页标题 -->
+    <title>影院 - 猫眼电影</title>
+    <style>
+        /* 重置 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #fff; color: #333; font-size: 14px;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul, li { list-style: none; }
+
+        /* 顶部导航栏 */
+        .top-nav {
+            height: 80px; border-bottom: 1px solid #e5e5e5;
+            display: flex; align-items: center; padding: 0 15%;
+            position: sticky; top: 0; background-color: #fff; z-index: 100;
+        }
+        .logo { display: flex; align-items: center; margin-right: 40px; }
+        .logo-icon {
+            width: 40px; height: 40px; background-color: #ef4238;
+            border-radius: 50%; color: #fff;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 18px; margin-right: 10px;
+        }
+        .logo-text { font-size: 20px; font-weight: bold; }
+        .main-menu { display: flex; height: 100%; }
+        .main-menu li { height: 100%; }
+        .main-menu li a {
+            display: flex; align-items: center; height: 100%;
+            padding: 0 20px; font-size: 16px; color: #333;
+        }
+        .main-menu li.active a { background-color: #ef4238; color: #fff; }
+        .nav-right {
+            margin-left: auto; display: flex; align-items: center;
+            gap: 20px; font-size: 14px;
+        }
+        .nav-right > div { cursor: pointer; }
+
+        /* 页面标题 */
+        .page-title {
+            width: 1200px; margin: 30px auto 20px;
+            font-size: 24px; font-weight: bold; color: #ef4238;
+        }
+
+        /* 提示 */
+        .tip {
+            width: 1200px; margin: 0 auto;
+            color: #999; font-size: 14px;
+            padding: 40px 0; text-align: center;
+        }
+        .tip a { color: #ef4238; }
+
+        /* 页脚 */
+        .footer {
+            background-color: #262426; color: #999;
+            padding: 40px 0; margin-top: 60px;
+            font-size: 12px; line-height: 2; text-align: center;
+        }
+        .footer a { color: #ef4238; margin: 0 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- ========== 顶部导航栏 ========== -->
+    <header class="top-nav">
+        <div class="logo">
+            <div class="logo-icon">猫</div>
+            <div class="logo-text">猫眼电影</div>
+        </div>
+        <ul class="main-menu">
+            <li><a th:href="@{/}">首页</a></li>
+            <li><a th:href="@{/}">电影</a></li>
+            <li class="active"><a th:href="@{/cinema}">影院</a></li>
+            <li><a href="#">演出</a></li>
+        </ul>
+        <div class="nav-right">
+            <div>📱 APP下载 ▼</div>
+            <div>👤 ▼</div>
+        </div>
+    </header>
+
+    <!-- 页面标题 -->
+    <h1 class="page-title">影院列表</h1>
+
+    <!-- 提示 -->
+    <div class="tip">
+        <p>请从 <a th:href="@{/}">首页</a> 选择电影 → 点击"购票" → 进入电影详情页 → 点击"特惠购票" → 选择影院与场次。</p>
+    </div>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="footer">
+        <div>关于猫眼：<a href="#">关于我们</a> | <a href="#">董事会成员</a> | <a href="#">投资者关系</a></div>
+        <div>©2026 猫眼电影 www.maoyan.com</div>
+    </footer>
+
+</body>
+</html>

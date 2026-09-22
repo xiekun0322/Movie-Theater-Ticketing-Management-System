@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<!-- 声明文档类型为 HTML5 -->
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<!-- 设置网页语言为中文，声明 Thymeleaf 命名空间 -->
+<head>
+    <!-- 设置字符编码为 UTF-8 -->
+    <meta charset="UTF-8">
+    <!-- 设置视口 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 网页标题 -->
+    <title th:text="${movie != null ? movie.title : '电影详情'} + '_猫眼电影'">电影详情</title>
+    <style>
+        /* 重置 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #fff; color: #333; font-size: 14px;
+        }
+        a { text-decoration: none; color: inherit; }
+        ul, li { list-style: none; }
+        img { display: block; }
+
+        /* ========== 顶部导航 ========== */
+        .top-nav {
+            height: 80px; border-bottom: 1px solid #e5e5e5;
+            display: flex; align-items: center; padding: 0 15%;
+            position: sticky; top: 0; background-color: #fff; z-index: 100;
+        }
+        .logo { display: flex; align-items: center; margin-right: 40px; }
+        .logo-icon {
+            width: 40px; height: 40px; background-color: #ef4238;
+            border-radius: 50%; color: #fff;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 18px; margin-right: 10px;
+        }
+        .logo-text { font-size: 20px; font-weight: bold; }
+        .city-select {
+            font-size: 14px; margin-right: 30px;
+            cursor: pointer; display: flex; align-items: center; gap: 3px;
+        }
+        .main-menu { display: flex; height: 100%; }
+        .main-menu li { height: 100%; }
+        .main-menu li a {
+            display: flex; align-items: center; height: 100%;
+            padding: 0 20px; font-size: 16px; color: #333; transition: all 0.3s;
+        }
+        .main-menu li.active a { color: #ef4238; }
+        .nav-right {
+            margin-left: auto; display: flex; align-items: center;
+            gap: 20px; font-size: 14px;
+        }
+        .nav-right > div { cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+        /* ========== 电影头部（紫色渐变） ========== */
+        .movie-header {
+            background: linear-gradient(to right, #2c1e4a, #4a3b6b);
+            color: #fff; padding: 40px 0;
+        }
+        .movie-header-content {
+            width: 1200px; margin: 0 auto;
+            display: flex; align-items: flex-start;
+        }
+        .movie-poster {
+            width: 240px; height: 340px; margin-right: 30px;
+            border-radius: 4px; overflow: hidden; flex-shrink: 0;
+            background-color: #1a1a1a; position: relative;
+        }
+        .movie-poster img { width: 100%; height: 100%; object-fit: cover; }
+        .poster-tag {
+            position: absolute; top: 8px; left: 8px;
+            background-color: #2b8eff; color: #fff;
+            font-size: 11px; padding: 2px 6px; border-radius: 2px;
+        }
+        .movie-info { flex: 1; }
+        .movie-title { font-size: 28px; font-weight: bold; margin-bottom: 8px; }
+        .movie-meta { font-size: 14px; color: #ccc; margin-bottom: 6px; }
+        .movie-actions { display: flex; gap: 15px; margin: 20px 0; }
+        .action-btn {
+            background-color: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff; padding: 8px 20px; border-radius: 4px;
+            cursor: pointer; display: flex; align-items: center; gap: 5px;
+            font-size: 14px; transition: background-color 0.3s;
+        }
+        .action-btn:hover { background-color: rgba(255,255,255,0.3); }
+        .buy-ticket-btn {
+            background-color: #ef4238; border: none; color: #fff;
+            padding: 10px 30px; border-radius: 4px;
+            cursor: pointer; font-size: 16px; font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .buy-ticket-btn:hover { background-color: #d6382f; }
+        .movie-stats {
+            text-align: right; margin-left: auto; flex-shrink: 0;
+        }
+        .rating-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
+        .rating-score {
+            font-size: 36px; color: #ffb400; font-weight: bold; line-height: 1;
+        }
+        .rating-score span { font-size: 16px; }
+        .rating-stars { color: #ffb400; font-size: 14px; margin: 5px 0; }
+        .rating-count { font-size: 12px; color: #ccc; margin-bottom: 20px; }
+        .box-office-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
+        .box-office-value { font-size: 24px; color: #fff; font-weight: bold; }
+        .box-office-value span { font-size: 14px; }
+
+        /* ========== 主体容器 ========== */
+        .container {
+            width: 1200px; margin: 0 auto; padding: 30px 0 60px;
+            display: flex; gap: 40px;
+        }
+        .main-content { flex: 1; }
+        .sidebar { width: 320px; flex-shrink: 0; }
+
+        /* 面包屑 */
+        .breadcrumb { font-size: 13px; color: #999; margin-bottom: 20px; }
+        .breadcrumb a { color: #999; }
+        .breadcrumb a:hover { color: #ef4238; }
+
+        /* Tab */
+        .tabs {
+            display: flex; border-bottom: 1px solid #e5e5e5;
+            margin-bottom: 25px; gap: 30px;
+        }
+        .tab-item {
+            padding: 10px 0; font-size: 16px; cursor: pointer;
+            color: #333; border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .tab-item.active { color: #ef4238; border-bottom-color: #ef4238; }
+
+        /* 区块标题 */
+        .section-title {
+            display: flex; align-items: center; margin-bottom: 15px;
+        }
+        .section-title::before {
+            content: ''; display: inline-block;
+            width: 4px; height: 18px; background-color: #ef4238;
+            margin-right: 8px; border-radius: 2px;
+        }
+        .section-title h3 { font-size: 18px; font-weight: bold; color: #333; }
+        .section-title .more {
+            margin-left: auto; font-size: 13px; color: #999; cursor: pointer;
+        }
+        .section-title .more:hover { color: #ef4238; }
+
+        /* 剧情简介 */
+        .plot-summary {
+            font-size: 14px; line-height: 1.9; color: #333;
+            text-indent: 2em; margin-bottom: 40px;
+        }
+
+        /* 演职人员 */
+        .cast-list {
+            display: flex; gap: 30px; margin-bottom: 40px; flex-wrap: wrap;
+        }
+        .cast-item { text-align: center; width: 100px; }
+        .cast-avatar {
+            width: 100px; height: 100px; border-radius: 4px;
+            overflow: hidden; margin-bottom: 8px; background-color: #f0f0f0;
+        }
+        .cast-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .cast-name { font-size: 14px; color: #333; margin-bottom: 3px; }
+        .cast-role { font-size: 12px; color: #999; }
+
+        /* 图集 */
+        .gallery {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 8px; margin-bottom: 40px; height: 320px;
+        }
+        .gallery-item {
+            overflow: hidden; border-radius: 4px; background-color: #f0f0f0;
+        }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
+        .gallery-item:first-child { grid-row: span 2; }
+
+        /* 影片资料 */
+        .movie-facts {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 15px; margin-bottom: 40px;
+        }
+        .fact-card {
+            border: 1px solid #e5e5e5; border-radius: 4px;
+            padding: 15px 20px;
+        }
+        .fact-label {
+            font-size: 13px; color: #999; margin-bottom: 8px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .fact-value { font-size: 14px; color: #333; }
+
+        /* 票房 */
+        .box-office-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 15px; margin-bottom: 40px;
+        }
+        .box-office-card {
+            background-color: #f8f8f8; border-radius: 4px;
+            padding: 25px 20px; text-align: center;
+        }
+        .box-office-card .value {
+            font-size: 28px; color: #ef4238; font-weight: bold;
+            margin-bottom: 8px;
+        }
+        .box-office-card .label { font-size: 13px; color: #999; }
+
+        /* ========== 选场次区域 ========== */
+        .schedule-section {
+            display: none; margin-top: 30px; padding: 25px;
+            background-color: #fafafa; border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .schedule-section.open { display: block; }
+        .schedule-header {
+            display: flex; align-items: center;
+            justify-content: space-between; margin-bottom: 20px;
+        }
+        .schedule-header h3 { font-size: 18px; font-weight: bold; }
+        .close-schedule {
+            font-size: 13px; color: #999; cursor: pointer;
+        }
+        .close-schedule:hover { color: #ef4238; }
+
+        /* 筛选 */
+        .filter-row {
+            display: flex; align-items: flex-start; margin-bottom: 12px;
+        }
+        .filter-row:last-child { margin-bottom: 0; }
+        .filter-label {
+            width: 60px; font-size: 13px; color: #999;
+            flex-shrink: 0; padding-top: 5px;
+        }
+        .filter-options { display: flex; flex-wrap: wrap; gap: 8px; }
+        .filter-option {
+            padding: 5px 14px; border-radius: 20px;
+            cursor: pointer; font-size: 13px; color: #333;
+            transition: all 0.3s;
+        }
+        .filter-option.active { background-color: #ef4238; color: #fff; }
+        .filter-option:hover { background-color: #f0f0f0; }
+        .filter-option.active:hover { background-color: #ef4238; }
+
+        /* 影院列表 */
+        .cinema-list { margin-top: 20px; }
+        .cinema-item {
+            background-color: #fff; border: 1px solid #eee;
+            border-radius: 6px; margin-bottom: 12px; overflow: hidden;
+        }
+        .cinema-main {
+            display: flex; justify-content: space-between;
+            align-items: center; padding: 18px 20px;
+        }
+        .cinema-info { flex: 1; }
+        .cinema-name { font-size: 15px; font-weight: bold; margin-bottom: 5px; }
+        .cinema-address { font-size: 13px; color: #999; margin-bottom: 8px; }
+        .cinema-tags { display: flex; gap: 8px; }
+        .cinema-tag {
+            font-size: 11px; color: #2b8eff;
+            border: 1px solid #2b8eff; padding: 1px 5px; border-radius: 3px;
+        }
+        .cinema-buy {
+            display: flex; flex-direction: column;
+            align-items: flex-end; margin-left: 20px;
+        }
+        .price-info { color: #ef4238; font-size: 13px; margin-bottom: 3px; }
+        .price-info span { font-size: 22px; font-weight: bold; }
+        .distance-info { font-size: 12px; color: #999; margin-bottom: 8px; }
+        .buy-btn {
+            background-color: #ef4238; color: #fff;
+            padding: 7px 18px; border-radius: 4px;
+            cursor: pointer; font-size: 13px; border: none;
+            transition: background-color 0.3s;
+        }
+        .buy-btn:hover { background-color: #d6382f; }
+        .buy-btn.expanded { background-color: #999; }
+
+        /* 场次列表 */
+        .schedule-list {
+            display: none; padding: 0 20px 15px;
+            background-color: #fafafa; border-top: 1px solid #eee;
+        }
+        .schedule-list.open { display: block; }
+        .schedule-date-tip {
+            font-size: 12px; color: #999; padding: 12px 0 8px;
+        }
+        .schedule-row {
+            display: flex; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #eee;
+        }
+        .schedule-row:last-child { border-bottom: none; }
+        .schedule-time {
+            width: 130px; font-size: 15px; font-weight: bold; color: #333;
+        }
+        .schedule-time small {
+            display: block; font-size: 11px; color: #999;
+            font-weight: normal; margin-top: 2px;
+        }
+        .schedule-hall { width: 120px; font-size: 13px; color: #666; }
+        .schedule-lang { width: 90px; font-size: 12px; color: #999; }
+        .schedule-price {
+            width: 90px; font-size: 15px; font-weight: bold; color: #ef4238;
+        }
+        .schedule-action { margin-left: auto; }
+        .schedule-btn {
+            display: inline-block;
+            background-color: #ef4238; color: #fff;
+            padding: 6px 16px; border-radius: 4px;
+            cursor: pointer; font-size: 13px; border: none;
+            transition: background-color 0.3s;
+        }
+        .schedule-btn:hover { background-color: #d6382f; }
+        .no-schedule {
+            color: #999; font-size: 13px;
+            padding: 15px 0; text-align: center;
+        }
+
+        /* ========== 侧边栏 ========== */
+        .sidebar-section { margin-bottom: 30px; }
+        .sidebar-title {
+            font-size: 16px; font-weight: bold; margin-bottom: 15px;
+            display: flex; align-items: center;
+        }
+        .sidebar-title::before {
+            content: ''; display: inline-block;
+            width: 3px; height: 16px; background-color: #ef4238;
+            margin-right: 8px; border-radius: 2px;
+        }
+        .sidebar-title .more {
+            margin-left: auto; font-size: 12px; color: #999;
+            font-weight: normal; cursor: pointer;
+        }
+        .trailer-item {
+            display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer;
+        }
+        .trailer-thumb {
+            width: 120px; height: 68px; border-radius: 4px;
+            overflow: hidden; background-color: #f0f0f0;
+            position: relative; flex-shrink: 0;
+        }
+        .trailer-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .trailer-num {
+            position: absolute; bottom: 0; left: 0;
+            background-color: #ffb400; color: #fff;
+            font-size: 11px; padding: 1px 5px; font-weight: bold;
+        }
+        .trailer-info { flex: 1; }
+        .trailer-title {
+            font-size: 13px; color: #333; line-height: 1.5; margin-bottom: 5px;
+        }
+        .trailer-count { font-size: 12px; color: #999; }
+
+        /* ========== 页脚 ========== */
+        .footer {
+            background-color: #262426; color: #999;
+            padding: 40px 0; margin-top: 60px;
+            font-size: 12px; line-height: 2; text-align: center;
+        }
+        .footer a { color: #ef4238; margin: 0 5px; }
+    </style>
+</head>
+<body>
+
+    <!-- ========== 顶部导航栏 ========== -->
+    <header class="top-nav">
+        <div class="logo">
+            <div class="logo-icon">猫</div>
+            <div class="logo-text">猫眼电影</div>
+        </div>
+        <div class="city-select">集美 ▼</div>
+        <ul class="main-menu">
+            <li><a th:href="@{/}">首页</a></li>
+            <li class="active"><a href="#">电影</a></li>
+            <li><a th:href="@{/cinema}">影院</a></li>
+            <li><a href="#">演出</a></li>
+        </ul>
+        <div class="nav-right">
+            <div>📱 APP下载 ▼</div>
+            <div>👤 ▼</div>
+        </div>
+    </header>
+
+    <!-- ========== 电影信息头部 ========== -->
+    <div class="movie-header">
+        <div class="movie-header-content">
+            <!-- 电影海报（用渐变色模拟） -->
+            <div class="movie-poster">
+                <div th:if="${movie != null and movie.tag != null}" class="poster-tag" th:text="${movie.tag}">2DIMAX</div>
+                <div class="poster-img" th:style="'background: ' + ${movie != null ? movie.poster : 'linear-gradient(45deg, #333, #666)'}"
+                     style="width:100%;height:100%;"></div>
+            </div>
+            <!-- 电影信息 -->
+            <div class="movie-info">
+                <h1 class="movie-title" th:text="${movie != null ? movie.title : '未知电影'}">电影标题</h1>
+                <div class="movie-meta">神话 喜剧 冒险 动画</div>
+                <div class="movie-meta">中国大陆 / 144分钟</div>
+                <div class="movie-meta" th:if="${movie != null}" th:text="${movie.releaseDate} + ' 中国大陆上映'">2026-07-18 上映</div>
+                <div class="movie-actions">
+                    <button class="action-btn">♡ 想看</button>
+                    <button class="action-btn">★ 评分</button>
+                </div>
+                <!-- 特惠购票按钮 -->
+                <button class="buy-ticket-btn" onclick="toggleScheduleSection()">特惠购票</button>
+            </div>
+            <!-- 右侧评分票房 -->
+            <div class="movie-stats">
+                <div class="rating-label">猫眼口碑</div>
+                <div class="rating-score" th:text="${movie != null and movie.score != null ? movie.score : '--'}">9.7 <span>分</span></div>
+                <div class="rating-stars">★★★★★</div>
+                <div class="rating-count">30.9万人评分</div>
+                <div class="box-office-label">累计票房</div>
+                <div class="box-office-value">19.50 <span>亿</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 主体容器 ========== -->
+    <div class="container">
+        <main class="main-content">
+            <div class="breadcrumb">
+                <a th:href="@{/}">猫眼电影</a> > <a href="#">电影</a> >
+                <span th:text="${movie != null ? movie.title : '详情'}">标题</span>
+            </div>
+
+            <div class="tabs">
+                <div class="tab-item active">介绍</div>
+                <div class="tab-item">演职人员</div>
+                <div class="tab-item">奖项</div>
+                <div class="tab-item">图集</div>
+            </div>
+
+            <!-- 剧情简介 -->
+            <div class="section-title"><h3>剧情简介</h3></div>
+            <p class="plot-summary">
+                2026年暑期档必看动画奇幻巨制，国民喜剧大片！影片以家喻户晓的传统民间故事"八仙过海"为灵感进行创作，金牌班底脑洞大开，蓬莱仙境上演凡夫斗神仙精彩好戏。
+            </p>
+
+            <!-- 演职人员 -->
+            <div class="section-title">
+                <h3>演职人员</h3>
+                <span class="more">全部 ></span>
+            </div>
+            <div class="cast-list">
+                <div class="cast-item">
+                    <div class="cast-avatar" style="background:#ccc;"></div>
+                    <div class="cast-name">牟正洋</div>
+                    <div class="cast-role">饰：吕洞宾</div>
+                </div>
+                <div class="cast-item">
+                    <div class="cast-avatar" style="background:#ccc;"></div>
+                    <div class="cast-name">李绍哲</div>
+                    <div class="cast-role">饰：钟离权</div>
+                </div>
+                <div class="cast-item">
+                    <div class="cast-avatar" style="background:#ccc;"></div>
+                    <div class="cast-name">陈浩</div>
+                    <div class="cast-role">饰：何仙姑</div>
+                </div>
+                <div class="cast-item">
+                    <div class="cast-avatar" style="background:#ccc;"></div>
+                    <div class="cast-name">立冬</div>
+                    <div class="cast-role">饰：铁拐李</div>
+                </div>
+                <div class="cast-item">
+                    <div class="cast-avatar" style="background:#ccc;"></div>
+                    <div class="cast-name">果子哥哥</div>
+                    <div class="cast-role">饰：铁拐李</div>
+                </div>
+            </div>
+
+            <!-- 图集 -->
+            <div class="section-title">
+                <h3>图集</h3>
+                <span class="more">全部 ></span>
+            </div>
+            <div class="gallery">
+                <div class="gallery-item" style="background:#e74c3c;"></div>
+                <div class="gallery-item" style="background:#f39c12;"></div>
+                <div class="gallery-item" style="background:#2ecc71;"></div>
+                <div class="gallery-item" style="background:#3498db;"></div>
+                <div class="gallery-item" style="background:#9b59b6;"></div>
+            </div>
+
+            <!-- 影片资料 -->
+            <div class="section-title"><h3>影片资料</h3></div>
+            <div class="movie-facts">
+                <div class="fact-card">
+                    <div class="fact-label">📦 出品发行</div>
+                    <div class="fact-value">成都画梦成帧影视文化传媒有限公司</div>
+                </div>
+                <div class="fact-card">
+                    <div class="fact-label">⚙️ 技术参数</div>
+                    <div class="fact-value">2小时24分钟</div>
+                </div>
+            </div>
+
+            <!-- 票房 -->
+            <div class="section-title">
+                <h3>票房</h3>
+                <span class="more">票房详情 ></span>
+            </div>
+            <div class="box-office-grid">
+                <div class="box-office-card">
+                    <div class="value">4</div>
+                    <div class="label">昨日排名</div>
+                </div>
+                <div class="box-office-card">
+                    <div class="value">20806</div>
+                    <div class="label">首周票房(万)</div>
+                </div>
+                <div class="box-office-card">
+                    <div class="value">194951</div>
+                    <div class="label">累计票房(万)</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 右侧侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">
+                    预告片
+                    <span class="more">更多 ></span>
+                </div>
+                <div class="trailer-item">
+                    <div class="trailer-thumb" style="background:#e74c3c;">
+                        <span class="trailer-num">1</span>
+                    </div>
+                    <div class="trailer-info">
+                        <div class="trailer-title">《八仙！》8月20日中国港澳...</div>
+                        <div class="trailer-count">320.1万</div>
+                    </div>
+                </div>
+                <div class="trailer-item">
+                    <div class="trailer-thumb" style="background:#f39c12;">
+                        <span class="trailer-num">2</span>
+                    </div>
+                    <div class="trailer-info">
+                        <div class="trailer-title">《八仙！》曹国舅惊艳亮相！...</div>
+                        <div class="trailer-count">185.5万</div>
+                    </div>
+                </div>
+                <div class="trailer-item">
+                    <div class="trailer-thumb" style="background:#9b59b6;">
+                        <span class="trailer-num">3</span>
+                    </div>
+                    <div class="trailer-info">
+                        <div class="trailer-title">《八仙！》还原真实生活最普...</div>
+                        <div class="trailer-count">155.1万</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- ========== 选场次区域（默认隐藏，点"特惠购票"展开） ========== -->
+    <div class="schedule-section" id="scheduleSection">
+        <div class="container" style="padding: 0; display: block;">
+            <div class="schedule-header">
+                <h3>选择影院与场次</h3>
+                <span class="close-schedule" onclick="toggleScheduleSection()">收起 ▲</span>
+            </div>
+
+            <!-- 筛选：日期 -->
+            <div class="filter-row">
+                <div class="filter-label">日期:</div>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="date">今天 9月22</div>
+                    <div class="filter-option" data-filter="date">明天 9月23</div>
+                    <div class="filter-option" data-filter="date">后天 9月24</div>
+                </div>
+            </div>
+            <!-- 筛选：品牌 -->
+            <div class="filter-row">
+                <div class="filter-label">品牌:</div>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="brand">全部</div>
+                    <div class="filter-option" data-filter="brand">万达影城</div>
+                    <div class="filter-option" data-filter="brand">中影国际影城</div>
+                    <div class="filter-option" data-filter="brand">博纳国际影城</div>
+                </div>
+            </div>
+            <!-- 筛选：行政区 -->
+            <div class="filter-row">
+                <div class="filter-label">行政区:</div>
+                <div class="filter-options">
+                    <div class="filter-option active" data-filter="area">全部</div>
+                    <div class="filter-option" data-filter="area">集美万达广场</div>
+                    <div class="filter-option" data-filter="area">云城万科里</div>
+                </div>
+            </div>
+
+            <!-- 影院列表（用场次数据按影院分组） -->
+            <div class="cinema-list">
+                <div class="no-schedule" th:if="${schedules == null or schedules.isEmpty()}">
+                    暂无场次信息
+                </div>
+                <div class="cinema-item" th:each="s : ${schedules}">
+                    <div class="cinema-main">
+                        <div class="cinema-info">
+                            <div class="cinema-name" th:text="${s.cinemaName}">影院名</div>
+                            <div class="cinema-address">影院地址</div>
+                            <div class="cinema-tags">
+                                <span class="cinema-tag">退</span>
+                                <span class="cinema-tag">改签</span>
+                            </div>
+                        </div>
+                        <div class="cinema-buy">
+                            <div class="price-info">¥<span th:text="${s.price}">0</span>起</div>
+                            <div class="distance-info">--</div>
+                            <a th:href="@{/seat/{id}(id=${s.id})}" class="buy-btn">选座购票</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== 页脚 ========== -->
+    <footer class="footer">
+        <div>关于猫眼：<a href="#">关于我们</a> | <a href="#">董事会成员</a> | <a href="#">投资者关系</a></div>
+        <div>©2026 猫眼电影 www.maoyan.com</div>
+    </footer>
+
+    <!-- ========== JS 交互 ========== -->
+    <script>
+        /* 展开/收起选场次区域 */
+        function toggleScheduleSection() {
+            var section = document.getElementById('scheduleSection');
+            section.classList.toggle('open');
+            if (section.classList.contains('open')) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        /* 筛选选项点击切换选中状态 */
+        document.querySelectorAll('.filter-option').forEach(function (option) {
+            option.addEventListener('click', function () {
+                var group = this.dataset.filter;
+                document.querySelectorAll('.filter-option[data-filter="' + group + '"]').forEach(function (el) {
+                    el.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>
