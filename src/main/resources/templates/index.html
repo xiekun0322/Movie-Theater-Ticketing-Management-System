@@ -1,205 +1,102 @@
 <!DOCTYPE html>
-<!-- 声明文档类型为 HTML5 -->
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
-<!-- 设置网页语言为中文，声明 Thymeleaf 命名空间 -->
 <head>
-    <!-- 设置字符编码为 UTF-8，防止中文乱码 -->
     <meta charset="UTF-8">
-    <!-- 设置视口，使网页在移动端也能良好显示 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 设置网页标题 -->
     <title>猫眼电影 - 娱乐看猫眼</title>
-    <!-- 引入内部 CSS 样式 -->
     <style>
-        /* 重置所有元素的默认边距和内边距 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        /* body 基础样式 */
-        body {
-            font-family: "Microsoft YaHei", Arial, sans-serif;
-            background-color: #fff;
-            color: #333;
-            font-size: 14px;
-        }
-
-        /* a 标签去下划线 */
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #fff; color: #333; font-size: 14px; }
         a { text-decoration: none; color: inherit; }
-
-        /* 列表去圆点 */
         ul, li { list-style: none; }
 
-        /* 顶部导航栏 */
+        /* 顶部导航 */
         .top-nav {
-            height: 80px;
-            border-bottom: 1px solid #e5e5e5;
-            display: flex;
-            align-items: center;
-            padding: 0 15%;
-            position: sticky;
-            top: 0;
-            background-color: #fff;
-            z-index: 100;
+            height: 80px; border-bottom: 1px solid #e5e5e5;
+            display: flex; align-items: center; padding: 0 15%;
+            position: sticky; top: 0; background: #fff; z-index: 100;
         }
-
-        /* Logo 区域 */
         .logo { display: flex; align-items: center; margin-right: 40px; }
         .logo-icon {
-            width: 40px; height: 40px;
-            background-color: #ef4238;
-            border-radius: 50%;
-            color: #fff;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 18px;
-            margin-right: 10px;
+            width: 40px; height: 40px; background: #ef4238; border-radius: 50%;
+            color: #fff; display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 18px; margin-right: 10px;
         }
         .logo-text { font-size: 20px; font-weight: bold; }
-
-        /* 主导航菜单 */
         .main-menu { display: flex; height: 100%; }
         .main-menu li { height: 100%; }
         .main-menu li a {
             display: flex; align-items: center; height: 100%;
             padding: 0 20px; font-size: 16px; color: #333;
-            transition: all 0.3s;
         }
-        .main-menu li.active a { background-color: #ef4238; color: #fff; }
+        .main-menu li.active a { background: #ef4238; color: #fff; }
+        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+        .nav-right > div { cursor: pointer; }
 
-        /* 右侧区域 */
-        .nav-right {
-            margin-left: auto; display: flex; align-items: center;
-            color: #333; font-size: 14px;
-        }
-        .nav-right > div { margin-left: 20px; cursor: pointer; }
-
-        /* 主体容器 */
-        .container {
-            width: 1200px; margin: 0 auto;
-            padding-top: 40px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* 左侧主内容 */
+        /* 主体 */
+        .container { width: 1200px; margin: 0 auto; padding-top: 40px; display: flex; justify-content: space-between; }
         .main-content { width: 840px; }
-
-        /* 右侧侧边栏 */
         .sidebar { width: 330px; }
 
         /* 区块标题 */
-        .section-title {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px;
-        }
+        .section-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .section-title h2 { font-size: 26px; font-weight: normal; color: #ef4238; }
         .section-title .more-link { color: #ef4238; font-size: 14px; cursor: pointer; }
 
         /* 电影网格 */
-        .movie-grid {
-            display: flex; flex-wrap: wrap;
-            gap: 30px 20px;
-        }
-
-        /* 电影卡片 */
+        .movie-grid { display: flex; flex-wrap: wrap; gap: 30px 20px; }
         .movie-card { width: 200px; display: flex; flex-direction: column; }
 
         /* 海报容器 */
-        .poster-wrapper {
-            width: 100%; height: 280px;
-            position: relative; background-color: #f0f0f0; overflow: hidden;
-        }
-
-        /* 海报图片（渐变色） */
-        .poster-img {
-            width: 100%; height: 100%;
-            object-fit: cover; background-color: #333;
-        }
-
-        /* 海报左上角标签 */
+        .poster-wrapper { width: 100%; height: 280px; position: relative; overflow: hidden; }
+        .poster-img { width: 100%; height: 100%; background-size: cover; }
         .poster-tag {
             position: absolute; top: 5px; left: 5px;
-            background-color: #2b8eff; color: #fff;
-            font-size: 10px; padding: 2px 5px; border-radius: 2px;
+            background: #2b8eff; color: #fff; font-size: 10px; padding: 2px 5px; border-radius: 2px;
         }
-
-        /* 海报底部文字 */
         .poster-bottom-info {
-            position: absolute; bottom: 0; left: 0; width: 100%;
-            padding: 5px 10px;
+            position: absolute; bottom: 0; left: 0; width: 100%; padding: 5px 10px;
             background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             color: #fff; font-size: 14px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-
-        /* 海报右下角评分 */
         .poster-score {
             position: absolute; bottom: 5px; right: 5px;
             color: #ffb400; font-size: 16px; font-weight: bold;
         }
 
-        /* 卡片操作栏 */
-        .card-actions {
-            display: flex;
-            border: 1px solid #e5e5e5;
-            border-top: none;
-            height: 40px;
-        }
-
-        /* 操作按钮 */
+        /* 操作栏 */
+        .card-actions { display: flex; border: 1px solid #e5e5e5; border-top: none; height: 40px; }
         .action-btn {
-            flex: 1;
-            display: flex; justify-content: center; align-items: center;
+            flex: 1; display: flex; justify-content: center; align-items: center;
             color: #ef4238; font-size: 14px; cursor: pointer;
             border-right: 1px solid #e5e5e5;
         }
         .action-btn:last-child { border-right: none; }
+        .card-subtext { text-align: center; color: #999; font-size: 12px; margin-top: 5px; }
 
-        /* 卡片下方文字 */
-        .card-subtext {
-            text-align: center; color: #999;
-            font-size: 12px; margin-top: 5px;
-        }
-
-        /* 侧边栏区块 */
+        /* 侧边栏 */
         .sidebar-section { margin-bottom: 30px; }
-
-        /* 票房列表项 */
         .box-office-item {
-            display: flex; align-items: center;
-            padding: 10px 0;
+            display: flex; align-items: center; padding: 10px 0;
             border-bottom: 1px dashed #e5e5e5;
         }
-        .rank-num {
-            width: 30px; text-align: center;
-            font-size: 18px; color: #999; font-weight: bold;
-        }
+        .rank-num { width: 30px; text-align: center; font-size: 18px; color: #999; font-weight: bold; }
         .rank-num.top3 { color: #ef4238; }
         .box-office-name {
             flex: 1; margin-left: 10px; font-size: 14px;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .box-office-amount { color: #ef4238; font-size: 14px; }
-
-        /* 今日大盘 */
         .daily-total {
-            background-color: #f8f8f8; padding: 20px;
-            display: flex; align-items: center; margin-top: 20px;
+            background: #f8f8f8; padding: 20px; display: flex; align-items: center; margin-top: 20px;
         }
-        .daily-total-label {
-            background-color: #ef4238; color: #fff;
-            padding: 10px 15px; font-size: 16px; margin-right: 20px;
-        }
+        .daily-total-label { background: #ef4238; color: #fff; padding: 10px 15px; margin-right: 20px; }
         .daily-total-data { font-size: 28px; color: #ef4238; font-weight: bold; }
         .daily-total-unit { font-size: 14px; color: #ef4238; margin-left: 5px; }
-        .daily-total-info {
-            margin-left: auto; text-align: right;
-            font-size: 12px; color: #999;
-        }
+        .daily-total-info { margin-left: auto; text-align: right; font-size: 12px; color: #999; }
 
-        /* 期待榜列表项 */
-        .expected-item {
-            display: flex; padding: 15px 0;
-            border-bottom: 1px solid #e5e5e5;
-        }
+        .expected-item { display: flex; padding: 15px 0; border-bottom: 1px solid #e5e5e5; }
         .expected-rank {
             font-size: 18px; font-weight: bold; color: #ffb400;
             width: 30px; text-align: center; margin-right: 10px;
@@ -208,52 +105,31 @@
         .expected-title { font-size: 16px; margin-bottom: 5px; }
         .expected-want { font-size: 12px; color: #ffb400; }
 
-        /* TOP100 列表项 */
         .top100-item {
-            display: flex; justify-content: space-between;
-            padding: 15px 0;
-            border-bottom: 1px solid #e5e5e5;
-            font-size: 16px;
+            display: flex; justify-content: space-between; padding: 15px 0;
+            border-bottom: 1px solid #e5e5e5; font-size: 16px;
         }
-        .top100-name-wrap { display: flex; align-items: center; }
-        .top100-rank {
-            color: #ffb400; font-weight: bold;
-            margin-right: 15px; width: 20px;
-        }
+        .top100-rank { color: #ffb400; font-weight: bold; margin-right: 15px; width: 20px; }
         .top100-score { color: #ffb400; font-weight: bold; }
 
         /* 页脚 */
         .footer {
-            background-color: #262426; color: #999;
-            padding: 40px 0; margin-top: 60px;
-            font-size: 12px; line-height: 2; text-align: center;
+            background: #262426; color: #999; padding: 40px 0;
+            margin-top: 60px; font-size: 12px; line-height: 2; text-align: center;
         }
         .footer a { color: #ef4238; margin: 0 5px; }
-        .footer-imgs {
-            margin-top: 20px; display: flex;
-            justify-content: center; gap: 10px;
-        }
-        .footer-img-placeholder {
-            width: 80px; height: 30px;
-            background-color: #444; border-radius: 3px;
-        }
+        .footer-imgs { margin-top: 20px; display: flex; justify-content: center; gap: 10px; }
+        .footer-img-placeholder { width: 80px; height: 30px; background: #444; border-radius: 3px; }
 
         /* 悬浮广告 */
         .floating-ad {
             position: fixed; bottom: 20px; left: 20px;
-            width: 160px; height: 200px;
-            background-color: #ef4238; border-radius: 10px;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            color: #fff; font-size: 12px; z-index: 1000;
-            cursor: pointer;
+            width: 160px; height: 200px; background: #ef4238; border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #fff; font-size: 12px; z-index: 1000; cursor: pointer;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .qr-placeholder {
-            width: 100px; height: 100px;
-            background-color: #fff; margin-top: 10px;
-            border-radius: 5px;
-        }
+        .qr-placeholder { width: 100px; height: 100px; background: #fff; margin-top: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -267,7 +143,7 @@
         <ul class="main-menu">
             <li class="active"><a th:href="@{/}">首页</a></li>
             <li><a th:href="@{/}">电影</a></li>
-            <li><a th:href="@{/cinema}">影院</a></li>
+            <li><a href="#">影院</a></li>
             <li><a href="#">演出</a></li>
         </ul>
         <div class="nav-right">
@@ -278,8 +154,6 @@
 
     <!-- ========== 主体容器 ========== -->
     <div class="container">
-
-        <!-- 左侧主内容 -->
         <main class="main-content">
 
             <!-- 第一部分：正在热映 -->
@@ -290,14 +164,18 @@
                 </div>
                 <div class="movie-grid">
                     <div class="movie-card" th:each="movie : ${showingMovies}">
-                        <div class="poster-wrapper">
-                            <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
-                            <div class="poster-img" th:style="'background: ' + ${movie.poster}"></div>
-                            <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
-                            <div class="poster-score" th:if="${movie.score != null}" th:text="${movie.score}">9.5</div>
-                        </div>
+                        <!-- ★ 点击海报区域 → 跳电影详情页 -->
+                        <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
+                            <div class="poster-wrapper">
+                                <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
+                                <div class="poster-img" th:style="'background: ' + ${movie.poster}"></div>
+                                <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
+                                <div class="poster-score" th:if="${movie.score != null}" th:text="${movie.score}">9.5</div>
+                            </div>
+                        </a>
                         <div class="card-actions">
-                            <a th:href="@{/movie/detail/{id}(id=${movie.id})}" class="action-btn">购票</a>
+                            <!-- ★ 点击购票 → 跳选影院/选场次页 -->
+                            <a th:href="@{/cinemas/{id}(id=${movie.id})}" class="action-btn">购票</a>
                         </div>
                     </div>
                 </div>
@@ -311,16 +189,20 @@
                 </div>
                 <div class="movie-grid">
                     <div class="movie-card" th:each="movie : ${upcomingMovies}">
-                        <div class="poster-wrapper">
-                            <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
-                            <div class="poster-img" th:style="'background: ' + ${movie.poster}"></div>
-                            <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
-                        </div>
+                        <!-- ★ 点击海报区域 → 跳电影详情页 -->
+                        <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
+                            <div class="poster-wrapper">
+                                <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
+                                <div class="poster-img" th:style="'background: ' + ${movie.poster}"></div>
+                                <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
+                            </div>
+                        </a>
                         <div class="card-subtext" th:if="${movie.wantCount != null}"
                              th:text="${movie.wantCount} + '人想看'">1234人想看</div>
                         <div class="card-actions">
                             <div class="action-btn">预告片</div>
-                            <a th:href="@{/movie/detail/{id}(id=${movie.id})}" class="action-btn">预售</a>
+                            <!-- ★ 点击预售 → 跳选影院/选场次页 -->
+                            <a th:href="@{/cinemas/{id}(id=${movie.id})}" class="action-btn">预售</a>
                         </div>
                         <div class="card-subtext" th:text="${movie.releaseDate} + '上映'">9月23日上映</div>
                     </div>
@@ -330,140 +212,45 @@
 
         <!-- 右侧侧边栏 -->
         <aside class="sidebar">
-
-            <!-- 今日票房 -->
             <div class="sidebar-section">
-                <div class="section-title">
-                    <h2>今日票房</h2>
-                </div>
+                <div class="section-title"><h2>今日票房</h2></div>
                 <ul>
-                    <li class="box-office-item">
-                        <span class="rank-num top3">1</span>
-                        <span class="box-office-name">奥德赛</span>
-                        <span class="box-office-amount">92.56万</span>
-                    </li>
-                    <li class="box-office-item">
-                        <span class="rank-num top3">2</span>
-                        <span class="box-office-name">欢迎来龙餐馆</span>
-                        <span class="box-office-amount">46.61万</span>
-                    </li>
-                    <li class="box-office-item">
-                        <span class="rank-num top3">3</span>
-                        <span class="box-office-name">空枪</span>
-                        <span class="box-office-amount">30.37万</span>
-                    </li>
-                    <li class="box-office-item">
-                        <span class="rank-num">4</span>
-                        <span class="box-office-name">八仙！</span>
-                        <span class="box-office-amount">17.36万</span>
-                    </li>
-                    <li class="box-office-item">
-                        <span class="rank-num">5</span>
-                        <span class="box-office-name">密档</span>
-                        <span class="box-office-amount">14.12万</span>
-                    </li>
+                    <li class="box-office-item"><span class="rank-num top3">1</span><span class="box-office-name">奥德赛</span><span class="box-office-amount">92.56万</span></li>
+                    <li class="box-office-item"><span class="rank-num top3">2</span><span class="box-office-name">欢迎来龙餐馆</span><span class="box-office-amount">46.61万</span></li>
+                    <li class="box-office-item"><span class="rank-num top3">3</span><span class="box-office-name">空枪</span><span class="box-office-amount">30.37万</span></li>
+                    <li class="box-office-item"><span class="rank-num">4</span><span class="box-office-name">八仙！</span><span class="box-office-amount">17.36万</span></li>
+                    <li class="box-office-item"><span class="rank-num">5</span><span class="box-office-name">密档</span><span class="box-office-amount">14.12万</span></li>
                 </ul>
                 <div class="daily-total">
                     <div class="daily-total-label">今日大盘</div>
-                    <div>
-                        <span class="daily-total-data">282.7</span>
-                        <span class="daily-total-unit">万</span>
-                    </div>
+                    <div><span class="daily-total-data">282.7</span><span class="daily-total-unit">万</span></div>
                     <div class="daily-total-info">
-                        <div style="color: #ef4238; margin-bottom: 5px;">查看更多 ></div>
+                        <div style="color:#ef4238;margin-bottom:5px;">查看更多 ></div>
                         <div>北京时间 09:50:03</div>
                         <div>猫眼专业版实时票房数据</div>
                     </div>
                 </div>
             </div>
-
-            <!-- 最受期待 -->
             <div class="sidebar-section" style="margin-top: 40px;">
                 <div class="section-title">
                     <h2>最受期待</h2>
                     <span class="more-link">查看完整榜单 ></span>
                 </div>
                 <ul>
-                    <li class="expected-item">
-                        <span class="expected-rank">1</span>
-                        <div class="expected-info">
-                            <div class="expected-title">复仇者联盟4：终局之战 (加码臻享版)</div>
-                            <div class="expected-want">2239942人想看</div>
-                        </div>
-                    </li>
-                    <li class="expected-item">
-                        <span class="expected-rank" style="color: #999;">2</span>
-                        <div class="expected-info">
-                            <div class="expected-title">生化危机：爆发夜</div>
-                            <div class="expected-want" style="color: #999;">144997人想看</div>
-                        </div>
-                    </li>
-                    <li class="expected-item">
-                        <span class="expected-rank" style="color: #999;">3</span>
-                        <div class="expected-info">
-                            <div class="expected-title">神探之痕迹</div>
-                            <div class="expected-want" style="color: #999;">91012人想看</div>
-                        </div>
-                    </li>
-                    <li class="expected-item">
-                        <span class="expected-rank" style="color: #999;">4</span>
-                        <div class="expected-info">
-                            <div class="expected-title">什么意思夫妇</div>
-                            <div class="expected-want" style="color: #999;">79122人想看</div>
-                        </div>
-                    </li>
-                    <li class="expected-item">
-                        <span class="expected-rank" style="color: #999;">5</span>
-                        <div class="expected-info">
-                            <div class="expected-title">流浪地球3</div>
-                            <div class="expected-want" style="color: #999;">641901人想看</div>
-                        </div>
-                    </li>
+                    <li class="expected-item"><span class="expected-rank">1</span><div class="expected-info"><div class="expected-title">复仇者联盟4：终局之战</div><div class="expected-want">2239942人想看</div></div></li>
+                    <li class="expected-item"><span class="expected-rank" style="color:#999;">2</span><div class="expected-info"><div class="expected-title">生化危机：爆发夜</div><div class="expected-want" style="color:#999;">144997人想看</div></div></li>
+                    <li class="expected-item"><span class="expected-rank" style="color:#999;">3</span><div class="expected-info"><div class="expected-title">神探之痕迹</div><div class="expected-want" style="color:#999;">91012人想看</div></div></li>
                 </ul>
             </div>
-
-            <!-- TOP100 -->
             <div class="sidebar-section" style="margin-top: 40px;">
                 <div class="section-title">
                     <h2>TOP 100</h2>
                     <span class="more-link">查看完整榜单 ></span>
                 </div>
                 <ul>
-                    <li class="top100-item">
-                        <div class="top100-name-wrap">
-                            <span class="top100-rank">1</span>
-                            <span>我不是药神</span>
-                        </div>
-                        <span class="top100-score">9.6分</span>
-                    </li>
-                    <li class="top100-item">
-                        <div class="top100-name-wrap">
-                            <span class="top100-rank">2</span>
-                            <span>肖申克的救赎</span>
-                        </div>
-                        <span class="top100-score">9.8分</span>
-                    </li>
-                    <li class="top100-item">
-                        <div class="top100-name-wrap">
-                            <span class="top100-rank">3</span>
-                            <span>海上钢琴师</span>
-                        </div>
-                        <span class="top100-score">9.3分</span>
-                    </li>
-                    <li class="top100-item">
-                        <div class="top100-name-wrap">
-                            <span class="top100-rank">4</span>
-                            <span>绿皮书</span>
-                        </div>
-                        <span class="top100-score">9.5分</span>
-                    </li>
-                    <li class="top100-item">
-                        <div class="top100-name-wrap">
-                            <span class="top100-rank">5</span>
-                            <span>霸王别姬</span>
-                        </div>
-                        <span class="top100-score">9.4分</span>
-                    </li>
+                    <li class="top100-item"><div><span class="top100-rank">1</span>我不是药神</div><span class="top100-score">9.6分</span></li>
+                    <li class="top100-item"><div><span class="top100-rank">2</span>肖申克的救赎</div><span class="top100-score">9.8分</span></li>
+                    <li class="top100-item"><div><span class="top100-rank">3</span>海上钢琴师</div><span class="top100-score">9.3分</span></li>
                 </ul>
             </div>
         </aside>
@@ -472,7 +259,6 @@
     <!-- ========== 页脚 ========== -->
     <footer class="footer">
         <div>关于猫眼：<a href="#">关于我们</a> | <a href="#">董事会成员</a> | <a href="#">投资者关系</a></div>
-        <div>商务合作邮箱：v@maoyan.com 客服电话：10105335</div>
         <div>©2026 猫眼电影 www.maoyan.com</div>
         <div class="footer-imgs">
             <div class="footer-img-placeholder"></div>
@@ -481,7 +267,6 @@
         </div>
     </footer>
 
-    <!-- 左下角悬浮广告 -->
     <div class="floating-ad">
         <div>丝滑抢票上猫眼</div>
         <div>手机扫码下载猫眼APP</div>
