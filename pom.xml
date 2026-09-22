@@ -18,7 +18,7 @@
     <description>Movie Theater Ticketing Management System</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
     </properties>
 
     <dependencies>
@@ -80,7 +80,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.30</version>
+                            <version>1.18.40</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
