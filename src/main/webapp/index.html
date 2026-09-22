@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<!-- 声明文档类型为 HTML5 -->
+<html lang="zh-CN">
+<!-- 设置网页语言为中文 -->
+<head>
+    <!-- 设置字符编码为 UTF-8，防止中文乱码 -->
+    <meta charset="UTF-8">
+    <!-- 设置视口，使网页在移动端也能良好显示 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 设置网页标题 -->
+    <title>猫眼电影 - 娱乐看猫眼</title>
+    <!-- 引入内部 CSS 样式 -->
+    <style>
+        /* 重置所有元素的默认边距和内边距，使用 border-box 盒模型 */
+        * {
+            margin: 0; /* 外边距为0 */
+            padding: 0; /* 内边距为0 */
+            box-sizing: border-box; /* 元素宽高包含边框和内边距 */
+        }
+
+        /* 设置 body 的基础样式 */
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif; /* 设置字体，优先微软雅黑 */
+            background-color: #fff; /* 背景色为白色 */
+            color: #333; /* 默认文字颜色为深灰色 */
+            font-size: 14px; /* 默认字体大小14px */
+        }
+
+        /* 取消 a 标签的下划线，并继承父元素颜色 */
+        a {
+            text-decoration: none; /* 去掉下划线 */
+            color: inherit; /* 继承父元素文字颜色 */
+        }
+
+        /* 取消 ul 和 li 的默认列表样式 */
+        ul, li {
+            list-style: none; /* 去掉列表项前面的圆点 */
+        }
+
+        /* 顶部导航栏容器 */
+        .top-nav {
+            height: 80px; /* 导航栏高度80px */
+            border-bottom: 1px solid #e5e5e5; /* 底部浅灰色边框 */
+            display: flex; /* 使用弹性盒布局 */
+            align-items: center; /* 垂直居中对齐 */
+            padding: 0 15%; /* 左右内边距为屏幕宽度的15% */
+            position: sticky; /* 粘性定位 */
+            top: 0; /* 距离顶部0 */
+            background-color: #fff; /* 背景色白色 */
+            z-index: 100; /* 确保导航栏在最上层 */
+        }
+
+        /* 猫眼 Logo 区域 */
+        .logo {
+            display: flex; /* 弹性布局 */
+            align-items: center; /* 垂直居中 */
+            margin-right: 40px; /* 右侧外边距40px */
+        }
+
+        /* Logo 图标（使用文字模拟） */
+        .logo-icon {
+            width: 40px; /* 宽度40px */
+            height: 40px; /* 高度40px */
+            background-color: #ef4238; /* 猫眼红背景 */
+            border-radius: 50%; /* 圆形 */
+            color: #fff; /* 白色文字 */
+            display: flex; /* 弹性布局 */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            font-weight: bold; /* 粗体 */
+            font-size: 18px; /* 字体大小18px */
+            margin-right: 10px; /* 右侧外边距10px */
+        }
+
+        /* Logo 文字 */
+        .logo-text {
+            font-size: 20px; /* 字体大小20px */
+            font-weight: bold; /* 粗体 */
+            color: #333; /* 深灰色文字 */
+        }
+
+        /* 主导航菜单 */
+        .main-menu {
+            display: flex; /* 弹性布局 */
+            height: 100%; /* 高度撑满父容器 */
+        }
+
+        /* 菜单项 */
+        .main-menu li {
+            height: 100%; /* 高度撑满 */
+        }
+
+        /* 菜单项链接 */
+        .main-menu li a {
+            display: flex; /* 弹性布局 */
+            align-items: center; /* 垂直居中 */
+            height: 100%; /* 高度撑满 */
+            padding: 0 20px; /* 左右内边距20px */
+            font-size: 16px; /* 字体大小16px */
+            color: #333; /* 文字颜色 */
+            transition: all 0.3s; /* 过渡动画 */
+        }
+
+        /* 菜单项选中状态 */
+        .main-menu li.active a {
+            background-color: #ef4238; /* 红色背景 */
+            color: #fff; /* 白色文字 */
+        }
+
+        /* 导航栏右侧区域 */
+        .nav-right {
+            margin-left: auto; /* 自动左边距，将其推到最右侧 */
+            display: flex; /* 弹性布局 */
+            align-items: center; /* 垂直居中 */
+            color: #333; /* 文字颜色 */
+            font-size: 14px; /* 字体大小 */
+        }
+
+        /* 右侧导航项间距 */
+        .nav-right > div {
+            margin-left: 20px; /* 左侧外边距20px */
+            cursor: pointer; /* 鼠标悬停手型 */
+        }
+
+        /* 主体内容容器 */
+        .container {
+            width: 1200px; /* 固定宽度1200px，符合PC端布局 */
+            margin: 0 auto; /* 水平居中 */
+            padding-top: 40px; /* 顶部内边距40px */
+            display: flex; /* 弹性布局，左侧主内容，右侧侧边栏 */
+            justify-content: space-between; /* 两端对齐 */
+        }
+
+        /* 左侧主内容区 */
+        .main-content {
+            width: 840px; /* 宽度840px */
+        }
+
+        /* 右侧侧边栏 */
+        .sidebar {
+            width: 330px; /* 宽度330px */
+        }
+
+        /* 区块标题容器 */
+        .section-title {
+            display: flex; /* 弹性布局 */
+            justify-content: space-between; /* 两端对齐 */
+            align-items: center; /* 垂直居中 */
+            margin-bottom: 20px; /* 底部外边距20px */
+        }
+
+        /* 区块主标题 */
+        .section-title h2 {
+            font-size: 26px; /* 字体大小26px */
+            font-weight: normal; /* 正常字重 */
+            color: #ef4238; /* 红色文字 */
+        }
+
+        /* 区块副标题/更多链接 */
+        .section-title .more-link {
+            color: #ef4238; /* 红色文字 */
+            font-size: 14px; /* 字体大小14px */
+            cursor: pointer; /* 鼠标手型 */
+        }
+
+        /* 电影网格容器 */
+        .movie-grid {
+            display: flex; /* 弹性布局 */
+            flex-wrap: wrap; /* 允许换行 */
+            gap: 30px 20px; /* 行间距30px，列间距20px */
+        }
+
+        /* 电影卡片 */
+        .movie-card {
+            width: 200px; /* 宽度200px */
+            display: flex; /* 弹性布局 */
+            flex-direction: column; /* 垂直排列 */
+        }
+
+        /* 电影海报容器 */
+        .poster-wrapper {
+            width: 100%; /* 宽度撑满 */
+            height: 280px; /* 高度280px */
+            position: relative; /* 相对定位，用于放置绝对定位元素 */
+            background-color: #f0f0f0; /* 默认背景色 */
+            overflow: hidden; /* 隐藏溢出内容 */
+        }
+
+        /* 电影海报图片（这里用背景色模拟） */
+        .poster-img {
+            width: 100%; /* 宽度撑满 */
+            height: 100%; /* 高度撑满 */
+            object-fit: cover; /* 保持比例填充 */
+            background-color: #333; /* 模拟图片的深色背景 */
+        }
+
+        /* 电影海报左上角标签（如 2DIMAX） */
+        .poster-tag {
+            position: absolute; /* 绝对定位 */
+            top: 5px; /* 距离顶部5px */
+            left: 5px; /* 距离左侧5px */
+            background-color: #2b8eff; /* 蓝色背景 */
+            color: #fff; /* 白色文字 */
+            font-size: 10px; /* 字体大小10px */
+            padding: 2px 5px; /* 内边距 */
+            border-radius: 2px; /* 圆角 */
+        }
+
+        /* 电影海报底部文字信息（如 "空枪"） */
+        .poster-bottom-info {
+            position: absolute; /* 绝对定位 */
+            bottom: 0; /* 距离底部0 */
+            left: 0; /* 距离左侧0 */
+            width: 100%; /* 宽度撑满 */
+            padding: 5px 10px; /* 内边距 */
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); /* 底部渐变黑色背景 */
+            color: #fff; /* 白色文字 */
+            font-size: 14px; /* 字体大小14px */
+            white-space: nowrap; /* 不换行 */
+            overflow: hidden; /* 隐藏溢出 */
+            text-overflow: ellipsis; /* 溢出显示省略号 */
+        }
+
+        /* 电影海报右下角评分 */
+        .poster-score {
+            position: absolute; /* 绝对定位 */
+            bottom: 5px; /* 距离底部5px */
+            right: 5px; /* 距离右侧5px */
+            color: #ffb400; /* 金黄色文字 */
+            font-size: 16px; /* 字体大小16px */
+            font-weight: bold; /* 粗体 */
+        }
+
+        /* 电影卡片底部操作栏 */
+        .card-actions {
+            display: flex; /* 弹性布局 */
+            border: 1px solid #e5e5e5; /* 边框 */
+            border-top: none; /* 去掉顶部边框 */
+            height: 40px; /* 高度40px */
+        }
+
+        /* 操作按钮（购票、预告片等） */
+        .action-btn {
+            flex: 1; /* 等分宽度 */
+            display: flex; /* 弹性布局 */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+            color: #ef4238; /* 红色文字 */
+            font-size: 14px; /* 字体大小14px */
+            cursor: pointer; /* 鼠标手型 */
+            border-right: 1px solid #e5e5e5; /* 右侧边框 */
+        }
+
+        /* 最后一个按钮去掉右侧边框 */
+        .action-btn:last-child {
+            border-right: none; /* 去掉右边框 */
+        }
+
+        /* 电影卡片下方文字（如 "9月23日上映"） */
+        .card-subtext {
+            text-align: center; /* 文字居中 */
+            color: #999; /* 灰色文字 */
+            font-size: 12px; /* 字体大小12px */
+            margin-top: 5px; /* 顶部外边距5px */
+        }
+
+        /* 侧边栏区块 */
+        .sidebar-section {
+            margin-bottom: 30px; /* 底部外边距30px */
+        }
+
+        /* 侧边栏票房列表项 */
+        .box-office-item {
+            display: flex; /* 弹性布局 */
+            align-items: center; /* 垂直居中 */
+            padding: 10px 0; /* 上下内边距10px */
+            border-bottom: 1px dashed #e5e5e5; /* 底部虚线边框 */
+        }
+
+        /* 票房排名序号 */
+        .rank-num {
+            width: 30px; /* 宽度30px */
+            text-align: center; /* 文字居中 */
+            font-size: 18px; /* 字体大小18px */
+            color: #999; /* 灰色 */
+            font-weight: bold; /* 粗体 */
+        }
+
+        /* 前三名序号颜色 */
+        .rank-num.top3 {
+            color: #ef4238; /* 红色 */
+        }
+
+        /* 票房电影名称 */
+        .box-office-name {
+            flex: 1; /* 占据剩余空间 */
+            margin-left: 10px; /* 左侧外边距 */
+            font-size: 14px; /* 字体大小 */
+            white-space: nowrap; /* 不换行 */
+            overflow: hidden; /* 隐藏溢出 */
+            text-overflow: ellipsis; /* 省略号 */
+        }
+
+        /* 票房金额 */
+        .box-office-amount {
+            color: #ef4238; /* 红色文字 */
+            font-size: 14px; /* 字体大小 */
+        }
+
+        /* 今日大盘红色背景卡片 */
+        .daily-total {
+            background-color: #f8f8f8; /* 浅灰背景 */
+            padding: 20px; /* 内边距 */
+            display: flex; /* 弹性布局 */
+            align-items: center; /* 垂直居中 */
+            margin-top: 20px; /* 顶部外边距 */
+        }
+
+        /* 今日大盘左侧红色标识 */
+        .daily-total-label {
+            background-color: #ef4238; /* 红色背景 */
+            color: #fff; /* 白色文字 */
+            padding: 10px 15px; /* 内边距 */
+            font-size: 16px; /* 字体大小 */
+            margin-right: 20px; /* 右侧外边距 */
+        }
+
+        /* 今日大盘数据 */
+        .daily-total-data {
+            font-size: 28px; /* 字体大小 */
+            color: #ef4238; /* 红色 */
+            font-weight: bold; /* 粗体 */
+        }
+
+        /* 今日大盘单位 */
+        .daily-total-unit {
+            font-size: 14px; /* 字体大小 */
+            color: #ef4238; /* 红色 */
+            margin-left: 5px; /* 左侧外边距 */
+        }
+
+        /* 今日大盘右侧信息 */
+        .daily-total-info {
+            margin-left: auto; /* 自动左边距，推到最右 */
+            text-align: right; /* 文字右对齐 */
+            font-size: 12px; /* 字体大小 */
+            color: #999; /* 灰色 */
+        }
+
+        /* 最受期待列表项 */
+        .expected-item {
+            display: flex; /* 弹性布局 */
+            padding: 15px 0; /* 上下内边距 */
+            border-bottom: 1px solid #e5e5e5; /* 底部边框 */
+        }
+
+        /* 期待榜排名 */
+        .expected-rank {
+            font-size: 18px; /* 字体大小 */
+            font-weight: bold; /* 粗体 */
+            color: #ffb400; /* 金黄色 */
+            width: 30px; /* 宽度 */
+            text-align: center; /* 居中 */
+            margin-right: 10px; /* 右侧外边距 */
+        }
+
+        /* 期待榜电影信息 */
+        .expected-info {
+            flex: 1; /* 占据剩余空间 */
+        }
+
+        /* 期待榜电影标题 */
+        .expected-title {
+            font-size: 16px; /* 字体大小 */
+            margin-bottom: 5px; /* 底部外边距 */
+        }
+
+        /* 期待榜电影想看人数 */
+        .expected-want {
+            font-size: 12px; /* 字体大小 */
+            color: #ffb400; /* 金黄色 */
+        }
+
+        /* TOP 100 列表项 */
+        .top100-item {
+            display: flex; /* 弹性布局 */
+            justify-content: space-between; /* 两端对齐 */
+            padding: 15px 0; /* 上下内边距 */
+            border-bottom: 1px solid #e5e5e5; /* 底部边框 */
+            font-size: 16px; /* 字体大小 */
+        }
+
+        /* TOP 100 排名和名称容器 */
+        .top100-name-wrap {
+            display: flex; /* 弹性布局 */
+            align-items: center; /* 垂直居中 */
+        }
+
+        /* TOP 100 排名数字 */
+        .top100-rank {
+            color: #ffb400; /* 金黄色 */
+            font-weight: bold; /* 粗体 */
+            margin-right: 15px; /* 右侧外边距 */
+            width: 20px; /* 宽度 */
+        }
+
+        /* TOP 100 评分 */
+        .top100-score {
+            color: #ffb400; /* 金黄色 */
+            font-weight: bold; /* 粗体 */
+        }
+
+        /* 页脚区域 */
+        .footer {
+            background-color: #262426; /* 深黑色背景 */
+            color: #999; /* 灰色文字 */
+            padding: 40px 0; /* 上下内边距 */
+            margin-top: 60px; /* 顶部外边距 */
+            font-size: 12px; /* 字体大小 */
+            line-height: 2; /* 行高 */
+            text-align: center; /* 文字居中 */
+        }
+
+        /* 页脚链接 */
+        .footer a {
+            color: #ef4238; /* 红色链接 */
+            margin: 0 5px; /* 左右外边距 */
+        }
+
+        /* 页脚图片容器 */
+        .footer-imgs {
+            margin-top: 20px; /* 顶部外边距 */
+            display: flex; /* 弹性布局 */
+            justify-content: center; /* 水平居中 */
+            gap: 10px; /* 间距 */
+        }
+
+        /* 页脚图片占位符 */
+        .footer-img-placeholder {
+            width: 80px; /* 宽度 */
+            height: 30px; /* 高度 */
+            background-color: #444; /* 深灰色背景 */
+            border-radius: 3px; /* 圆角 */
+        }
+
+        /* 左下角固定悬浮广告 */
+        .floating-ad {
+            position: fixed; /* 固定定位 */
+            bottom: 20px; /* 距离底部20px */
+            left: 20px; /* 距离左侧20px */
+            width: 160px; /* 宽度160px */
+            height: 200px; /* 高度200px */
+            background-color: #ef4238; /* 红色背景 */
+            border-radius: 10px; /* 圆角 */
+            display: flex; /* 弹性布局 */
+            flex-direction: column; /* 垂直排列 */
+            align-items: center; /* 水平居中 */
+            justify-content: center; /* 垂直居中 */
+            color: #fff; /* 白色文字 */
+            font-size: 12px; /* 字体大小 */
+            z-index: 1000; /* 确保在最上层 */
+            cursor: pointer; /* 鼠标手型 */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* 阴影 */
+        }
+
+        /* 悬浮广告内的二维码占位符 */
+        .qr-placeholder {
+            width: 100px; /* 宽度 */
+            height: 100px; /* 高度 */
+            background-color: #fff; /* 白色背景 */
+            margin-top: 10px; /* 顶部外边距 */
+            border-radius: 5px; /* 圆角 */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航栏 -->
+    <header class="top-nav">
+        <!-- Logo 区域 -->
+        <div class="logo">
+            <!-- 模拟 Logo 图标 -->
+            <div class="logo-icon">猫</div>
+            <!-- Logo 文字 -->
+            <div class="logo-text">猫眼电影</div>
+        </div>
+        <!-- 主导航菜单 -->
+        <ul class="main-menu">
+            <!-- 菜单项：首页（选中状态） -->
+            <li class="active"><a href="#">首页</a></li>
+            <!-- 菜单项：电影 -->
+            <li><a href="#">电影</a></li>
+            <!-- 菜单项：影院 -->
+            <li><a href="#">影院</a></li>
+            <!-- 菜单项：演出 -->
+            <li><a href="#">演出</a></li>
+        </ul>
+        <!-- 右侧功能区 -->
+        <div class="nav-right">
+            <!-- APP下载 -->
+            <div>📱 APP下载 ▼</div>
+            <!-- 用户头像 -->
+            <div>👤 ▼</div>
+        </div>
+    </header>
+
+    <!-- 主体内容容器 -->
+    <div class="container">
+        
+        <!-- 左侧主内容区 -->
+        <main class="main-content">
+            
+            <!-- 第一部分：正在热映 -->
+            <section>
+                <!-- 区块标题 -->
+                <div class="section-title">
+                    <!-- 标题文字，包含总数 -->
+                    <h2>正在热映 (30部)</h2>
+                    <!-- 查看更多链接 -->
+                    <span class="more-link">全部 ></span>
+                </div>
+                <!-- 电影网格 -->
+                <div class="movie-grid">
+                    <!-- 电影卡片 1 -->
+                    <div class="movie-card">
+                        <!-- 海报容器 -->
+                        <div class="poster-wrapper">
+                            <!-- 海报图片（用颜色模拟） -->
+                            <div class="poster-img" style="background: linear-gradient(45deg, #1a2a6c, #b21f1f);"></div>
+                            <!-- 海报底部文字 -->
+                            <div class="poster-bottom-info">空枪</div>
+                            <!-- 海报评分 -->
+                            <div class="poster-score">9.5</div>
+                        </div>
+                        <!-- 卡片操作按钮 -->
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 2 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <!-- 左上角标签 -->
+                            <div class="poster-tag">2DIMAX</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #00b4db, #0083b0);"></div>
+                            <div class="poster-bottom-info">八仙！</div>
+                            <div class="poster-score">9.7</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 3 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-tag">2DIMAX</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #f2994a, #f2c94c);"></div>
+                            <div class="poster-bottom-info">欢迎来龙餐馆</div>
+                            <div class="poster-score">9.7</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 4 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-tag">2DIMAX</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #141e30, #243b55);"></div>
+                            <div class="poster-bottom-info">奥德赛</div>
+                            <div class="poster-score">9.5</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 5 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-tag">2DIMAX</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #4b6cb7, #182848);"></div>
+                            <div class="poster-bottom-info">复仇者联盟4：终...</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 6 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-tag">3D</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #cb2d3e, #ef473a);"></div>
+                            <div class="poster-bottom-info">鸳鸯楼底</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 7 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #000000, #434343);"></div>
+                            <div class="poster-bottom-info">痴迷</div>
+                            <div class="poster-score">9.0</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                    <!-- 电影卡片 8 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-tag">2DIMAX</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #ed213a, #93291e);"></div>
+                            <div class="poster-bottom-info">蜘蛛侠：崭新...</div>
+                            <div class="poster-score">9.2</div>
+                        </div>
+                        <div class="card-actions">
+                            <div class="action-btn">购票</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第二部分：即将上映 -->
+            <section style="margin-top: 50px;">
+                <!-- 区块标题 -->
+                <div class="section-title">
+                    <h2>即将上映 (121部)</h2>
+                    <span class="more-link">全部 ></span>
+                </div>
+                <!-- 电影网格 -->
+                <div class="movie-grid">
+                    <!-- 电影卡片 1 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #f12711, #f5af19);"></div>
+                            <div class="poster-bottom-info">水东游</div>
+                        </div>
+                        <div class="card-subtext">1238人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn">预售</div>
+                        </div>
+                        <div class="card-subtext">9月23日上映</div>
+                    </div>
+                    <!-- 电影卡片 2 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #200122, #6f0000);"></div>
+                            <div class="poster-bottom-info">追光者</div>
+                        </div>
+                        <div class="card-subtext">345人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn">预售</div>
+                        </div>
+                        <div class="card-subtext">9月23日上映</div>
+                    </div>
+                    <!-- 电影卡片 3 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #2193b0, #6dd5ed);"></div>
+                            <div class="poster-bottom-info">明月照他乡</div>
+                        </div>
+                        <div class="card-subtext">726人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn">预售</div>
+                        </div>
+                        <div class="card-subtext">9月24日上映</div>
+                    </div>
+                    <!-- 电影卡片 4 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #11998e, #38ef7d);"></div>
+                            <div class="poster-bottom-info">肆条</div>
+                        </div>
+                        <div class="card-subtext">639人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn">预售</div>
+                        </div>
+                        <div class="card-subtext">9月24日上映</div>
+                    </div>
+                    <!-- 电影卡片 5 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #333333, #dd1818);"></div>
+                            <div class="poster-bottom-info">惊悚的诞生</div>
+                        </div>
+                        <div class="card-subtext">345人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn">预售</div>
+                        </div>
+                        <div class="card-subtext">9月24日上映</div>
+                    </div>
+                    <!-- 电影卡片 6 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-tag">2DIMAX</div>
+                            <div class="poster-img" style="background: linear-gradient(45deg, #000046, #1cb5e0);"></div>
+                            <div class="poster-bottom-info">复仇者联盟4：终...</div>
+                        </div>
+                        <div class="card-subtext">2239942人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn" style="color: #2b8eff;">预售</div>
+                        </div>
+                        <div class="card-subtext">9月25日上映</div>
+                    </div>
+                    <!-- 电影卡片 7 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #870000, #190a05);"></div>
+                            <div class="poster-bottom-info">老江湖</div>
+                        </div>
+                        <div class="card-subtext">68734人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn" style="color: #2b8eff;">预售</div>
+                        </div>
+                        <div class="card-subtext">9月25日上映</div>
+                    </div>
+                    <!-- 电影卡片 8 -->
+                    <div class="movie-card">
+                        <div class="poster-wrapper">
+                            <div class="poster-img" style="background: linear-gradient(45deg, #f12711, #f5af19);"></div>
+                            <div class="poster-bottom-info">红孩儿火焰山之王</div>
+                        </div>
+                        <div class="card-subtext">30942人想看</div>
+                        <div class="card-actions">
+                            <div class="action-btn">预告片</div>
+                            <div class="action-btn">预售</div>
+                        </div>
+                        <div class="card-subtext">9月25日上映</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 右侧侧边栏 -->
+        <aside class="sidebar">
+            
+            <!-- 区块：今日票房 -->
+            <div class="sidebar-section">
+                <!-- 标题 -->
+                <div class="section-title">
+                    <h2>今日票房</h2>
+                </div>
+                <!-- 票房列表 -->
+                <ul>
+                    <!-- 第一名 -->
+                    <li class="box-office-item">
+                        <span class="rank-num top3">1</span>
+                        <span class="box-office-name">奥德赛</span>
+                        <span class="box-office-amount">92.56万</span>
+                    </li>
+                    <!-- 第二名 -->
+                    <li class="box-office-item">
+                        <span class="rank-num top3">2</span>
+                        <span class="box-office-name">欢迎来龙餐馆</span>
+                        <span class="box-office-amount">46.61万</span>
+                    </li>
+                    <!-- 第三名 -->
+                    <li class="box-office-item">
+                        <span class="rank-num top3">3</span>
+                        <span class="box-office-name">空枪</span>
+                        <span class="box-office-amount">30.37万</span>
+                    </li>
+                    <!-- 第四名 -->
+                    <li class="box-office-item">
+                        <span class="rank-num">4</span>
+                        <span class="box-office-name">八仙！</span>
+                        <span class="box-office-amount">17.36万</span>
+                    </li>
+                    <!-- 第五名 -->
+                    <li class="box-office-item">
+                        <span class="rank-num">5</span>
+                        <span class="box-office-name">密档</span>
+                        <span class="box-office-amount">14.12万</span>
+                    </li>
+                </ul>
+                <!-- 今日大盘数据卡片 -->
+                <div class="daily-total">
+                    <!-- 左侧红色标签 -->
+                    <div class="daily-total-label">今日大盘</div>
+                    <!-- 右侧数据 -->
+                    <div>
+                        <span class="daily-total-data">282.7</span>
+                        <span class="daily-total-unit">万</span>
+                    </div>
+                    <!-- 右侧信息 -->
+                    <div class="daily-total-info">
+                        <div style="color: #ef4238; margin-bottom: 5px;">查看更多 ></div>
+                        <div>北京时间 09:50:03</div>
+                        <div>猫眼专业版实时票房数据</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 区块：最受期待 -->
+            <div class="sidebar-section" style="margin-top: 40px;">
+                <!-- 标题 -->
+                <div class="section-title">
+                    <h2>最受期待</h2>
+                    <span class="more-link">查看完整榜单 ></span>
+                </div>
+                <!-- 期待列表 -->
+                <ul>
+                    <!-- 第一名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank">1</span>
+                        <div class="expected-info">
+                            <div class="expected-title">复仇者联盟4：终局之战 (加码臻享版)</div>
+                            <div class="expected-want">2239942人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第二名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">2</span>
+                        <div class="expected-info">
+                            <div class="expected-title">生化危机：爆发夜</div>
+                            <div class="expected-want" style="color: #999;">144997人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第三名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">3</span>
+                        <div class="expected-info">
+                            <div class="expected-title">神探之痕迹</div>
+                            <div class="expected-want" style="color: #999;">91012人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第四名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">4</span>
+                        <div class="expected-info">
+                            <div class="expected-title">什么意思夫妇</div>
+                            <div class="expected-want" style="color: #999;">79122人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第五名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">5</span>
+                        <div class="expected-info">
+                            <div class="expected-title">流浪地球3</div>
+                            <div class="expected-want" style="color: #999;">641901人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第六名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">6</span>
+                        <div class="expected-info">
+                            <div class="expected-title">小猪佩奇·完美假期</div>
+                            <div class="expected-want" style="color: #999;">75072人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第七名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">7</span>
+                        <div class="expected-info">
+                            <div class="expected-title">重生2</div>
+                            <div class="expected-want" style="color: #999;">28245人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第八名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">8</span>
+                        <div class="expected-info">
+                            <div class="expected-title">老江湖</div>
+                            <div class="expected-want" style="color: #999;">68734人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第九名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">9</span>
+                        <div class="expected-info">
+                            <div class="expected-title">野兽之心</div>
+                            <div class="expected-want" style="color: #999;">20823人想看</div>
+                        </div>
+                    </li>
+                    <!-- 第十名 -->
+                    <li class="expected-item">
+                        <span class="expected-rank" style="color: #999;">10</span>
+                        <div class="expected-info">
+                            <div class="expected-title">活色生香</div>
+                            <div class="expected-want" style="color: #999;">14335人想看</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 区块：TOP 100 -->
+            <div class="sidebar-section" style="margin-top: 40px;">
+                <!-- 标题 -->
+                <div class="section-title">
+                    <h2>TOP 100</h2>
+                    <span class="more-link">查看完整榜单 ></span>
+                </div>
+                <!-- TOP 100 列表 -->
+                <ul>
+                    <!-- 第一名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">1</span>
+                            <span>我不是药神</span>
+                        </div>
+                        <span class="top100-score">9.6分</span>
+                    </li>
+                    <!-- 第二名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">2</span>
+                            <span>肖申克的救赎</span>
+                        </div>
+                        <span class="top100-score">9.8分</span>
+                    </li>
+                    <!-- 第三名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">3</span>
+                            <span>海上钢琴师</span>
+                        </div>
+                        <span class="top100-score">9.3分</span>
+                    </li>
+                    <!-- 第四名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">4</span>
+                            <span>绿皮书</span>
+                        </div>
+                        <span class="top100-score">9.5分</span>
+                    </li>
+                    <!-- 第五名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">5</span>
+                            <span>霸王别姬</span>
+                        </div>
+                        <span class="top100-score">9.4分</span>
+                    </li>
+                    <!-- 第六名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">6</span>
+                            <span>美丽人生</span>
+                        </div>
+                        <span class="top100-score">9.3分</span>
+                    </li>
+                    <!-- 第七名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">7</span>
+                            <span>星际穿越</span>
+                        </div>
+                        <span class="top100-score">9.3分</span>
+                    </li>
+                    <!-- 第八名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">8</span>
+                            <span>这个杀手不太冷</span>
+                        </div>
+                        <span class="top100-score">9.5分</span>
+                    </li>
+                    <!-- 第九名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">9</span>
+                            <span>泰坦尼克号</span>
+                        </div>
+                        <span class="top100-score">9.6分</span>
+                    </li>
+                    <!-- 第十名 -->
+                    <li class="top100-item">
+                        <div class="top100-name-wrap">
+                            <span class="top100-rank">10</span>
+                            <span>盗梦空间</span>
+                        </div>
+                        <span class="top100-score">9.0分</span>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <!-- 页脚区域 -->
+    <footer class="footer">
+        <!-- 第一行：关于猫眼、友情链接等 -->
+        <div>
+            关于猫眼：<a href="#">关于我们</a> | <a href="#">董事会成员</a> | <a href="#">投资者关系</a> 
+            友情链接：<a href="#">美团网</a> | <a href="#">格瓦拉</a> | <a href="#">美团下载</a> | <a href="#">欢喜首映</a>
+        </div>
+        <!-- 第二行：商务合作、客服电话等 -->
+        <div>商务合作邮箱：v@maoyan.com 客服电话：10105335 违法和不良信息/涉未成年人有害信息举报电话：4006018900</div>
+        <!-- 第三行：举报邮箱等 -->
+        <div>用户举报/涉未成年人有害信息举报邮箱：tousujubao@meituan.com 舞弊线索举报邮箱：wubijubao@maoyan.com</div>
+        <!-- 第四行：许可证信息 -->
+        <div>中华人民共和国增值电信业务经营许可证 京B2-20190350 | 营业性演出许可证 京演（机构）（2019）4094号</div>
+        <!-- 第五行：广播电视节目制作经营许可证 -->
+        <div>广播电视节目制作经营许可证（京）字第08478号 | 网络文化经营许可证 京网文（2022）1334-041号</div>
+        <!-- 第六行：艺术品经营单位备案证明 -->
+        <div>艺术品经营单位备案证明 京东艺（2022）0095号</div>
+        <!-- 第七行：用户服务协议、隐私政策等 -->
+        <div>猫眼用户服务协议 | 猫眼平台交易规则总则 | 隐私政策</div>
+        <!-- 第八行：京公网安备、京ICP备 -->
+        <div>京公网安备 11010502061239号 | 京ICP备16022489号-1</div>
+        <!-- 第九行：公司名称 -->
+        <div>北京猫眼文化传媒有限公司</div>
+        <!-- 第十行：版权信息 -->
+        <div>©2026 猫眼电影 www.maoyan.com</div>
+        <!-- 底部图片标识 -->
+        <div class="footer-imgs">
+            <div class="footer-img-placeholder"></div>
+            <div class="footer-img-placeholder"></div>
+            <div class="footer-img-placeholder"></div>
+        </div>
+    </footer>
+
+    <!-- 左下角固定悬浮广告 -->
+    <div class="floating-ad">
+        <!-- 广告文字 -->
+        <div>丝滑抢票上猫眼</div>
+        <div>手机扫码下载猫眼APP</div>
+        <!-- 二维码占位符 -->
+        <div class="qr-placeholder"></div>
+    </div>
+
+</body>
+</html>
