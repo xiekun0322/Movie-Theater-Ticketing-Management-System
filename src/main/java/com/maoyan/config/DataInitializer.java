@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired; // 导入 @Autowi
 import org.springframework.boot.CommandLineRunner; // 导入启动运行接口
 import org.springframework.stereotype.Component; // 导入 @Component
 
+import java.util.List; // 导入 List
+
 /**
  * 数据初始化器
  * 项目启动时自动插入测试数据
@@ -27,7 +29,12 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // 已有数据则跳过
-        if (movieRepository.count() > 0) return;
+        if (movieRepository.count() > 0) {
+            System.out.println("====== 数据库已有数据，跳过初始化 ======");
+            return;
+        }
+
+        System.out.println("====== 开始初始化数据 ======");
 
         // ========== 插入电影 ==========
         // 正在热映（id 1~8）
@@ -66,6 +73,21 @@ public class DataInitializer implements CommandLineRunner {
         // 影院 3：幸福蓝海国际影城
         scheduleRepository.save(createSchedule(2L, 3L, "幸福蓝海国际影城 (集美世茂广场IMAX店)", "IMAX厅", "15:00", "17:24", "国语 2D", 34.5, "2026-09-22"));
         scheduleRepository.save(createSchedule(2L, 3L, "幸福蓝海国际影城 (集美世茂广场IMAX店)", "IMAX厅", "20:00", "22:24", "国语 2D", 39.0, "2026-09-22"));
+
+        // ========== 给所有其他电影补充场次 ==========
+        System.out.println("====== 开始为所有电影补充场次数据 ======");
+        List<Movie> allMovies = movieRepository.findAll();
+        for (Movie movie : allMovies) {
+            // 跳过《八仙！》，它已经有自己的场次了
+            if (movie.getId() == 2L) continue;
+
+            // 为每部电影插入 3 个不同影院的场次
+            scheduleRepository.save(createSchedule(movie.getId(), 1L, "厦门华侨大学店", "1号厅", "10:30", "12:54", "国语 2D", 34.0, "2026-09-22"));
+            scheduleRepository.save(createSchedule(movie.getId(), 2L, "寰映影城 (集美IOI广场激光IMAX店)", "IMAX厅", "14:20", "16:44", "国语 2D", 35.0, "2026-09-22"));
+            scheduleRepository.save(createSchedule(movie.getId(), 3L, "幸福蓝海国际影城 (集美世茂广场IMAX店)", "IMAX厅", "19:00", "21:24", "国语 2D", 40.0, "2026-09-22"));
+        }
+
+        System.out.println("====== 数据初始化完成！ ======");
     }
 
     /** 辅助方法：创建电影对象 */

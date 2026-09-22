@@ -84,8 +84,15 @@ public class PageController {
      */
     @GetMapping("/seat/{scheduleId}")
     public String seat(@PathVariable Long scheduleId, Model model) {
+        // 1. 查询场次信息
         Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
         model.addAttribute("schedule", schedule);
+        
+        // 2. 如果场次存在，查询对应的电影信息并传入前端
+        if (schedule != null) {
+            Movie movie = movieRepository.findById(schedule.getMovieId()).orElse(null);
+            model.addAttribute("movie", movie);
+        }
         return "seat";
     }
 }
