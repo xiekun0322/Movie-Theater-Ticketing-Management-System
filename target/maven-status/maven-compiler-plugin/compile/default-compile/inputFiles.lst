@@ -1,3 +1,9 @@
-C:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\repository\MovieRepository.java
-C:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\controller\Controller.java
-C:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\entity\Movie.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\controller\PageController.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\repository\MovieRepository.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\controller\MovieController.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\entity\Movie.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\repository\ScheduleRepository.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\config\DataInitializer.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\controller\ScheduleController.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\MovieTicketingApplication.java
+c:\Users\ZhuanZ\eclipse-workspace\Movie Theater Ticketing Management System\src\main\java\com\maoyan\entity\Schedule.java

@@ -16,20 +16,17 @@
         .main-menu { display: flex; height: 100%; }
         .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
 
-        .step-bar { width: 1200px; margin: 30px auto 20px; display: flex; justify-content: center; align-items: center; }
-        .step { display: flex; align-items: center; flex-direction: column; width: 200px; }
-        .step-circle { width: 28px; height: 28px; border-radius: 50%; background: #ef4238; border: 2px solid #ef4238; color: #fff; display: flex; justify-content: center; align-items: center; font-size: 14px; margin-bottom: 10px; font-weight: bold; }
-        .step-circle.gray { background: #fff; border-color: #f5c6c4; color: #f5c6c4; }
-        .step-text { font-size: 14px; color: #ef4238; font-weight: bold; }
-        .step-text.gray { color: #f5c6c4; font-weight: normal; }
-        .step-line { flex: 1; height: 2px; background: #ef4238; margin: 0 -100px; margin-top: -18px; }
-        .step-line.gray { background: #f5c6c4; }
+        .container { width: 900px; margin: 40px auto 60px; }
 
-        .container { width: 900px; margin: 0 auto 60px; }
+        /* 倒计时提示区 */
         .tip-box { background: #fef0f0; padding: 20px 30px; border-radius: 4px; display: flex; align-items: center; margin-bottom: 30px; }
         .tip-icon { font-size: 32px; margin-right: 20px; color: #ef4238; }
-        .tip-title { font-size: 18px; color: #ef4238; font-weight: bold; margin-bottom: 5px; }
+        .tip-title { font-size: 18px; color: #ef4238; font-weight: bold; margin-bottom: 6px; }
+        .tip-title .num { color: #ef4238; font-size: 22px; font-weight: bold; }
         .tip-sub { font-size: 13px; color: #999; }
+        .tip-box.timeout { background: #f0f0f0; }
+        .tip-box.timeout .tip-icon,
+        .tip-box.timeout .tip-title { color: #999; }
 
         .warning { color: #ff9800; font-size: 13px; margin-bottom: 15px; }
 
@@ -71,38 +68,18 @@
     </ul>
 </header>
 
-<!-- 进度条：全部静态，不做动态类名，避免 Thymeleaf 表达式出错 -->
-<div class="step-bar">
-    <div class="step">
-        <div class="step-circle">1</div>
-        <div class="step-text">选择影片场次</div>
-    </div>
-    <div class="step-line"></div>
-    <div class="step">
-        <div class="step-circle">2</div>
-        <div class="step-text">选择座位</div>
-    </div>
-    <div class="step-line" th:classappend="${order != null and order.status == 'paid'} ? 'gray' : ''"></div>
-    <div class="step">
-        <div class="step-circle" th:classappend="${order != null and order.status == 'paid'} ? '' : 'gray'">3</div>
-        <div class="step-text" th:classappend="${order != null and order.status == 'paid'} ? '' : 'gray'">15分钟内付款</div>
-    </div>
-    <div class="step-line" th:classappend="${order != null and order.status == 'paid'} ? '' : 'gray'"></div>
-    <div class="step">
-        <div class="step-circle" th:classappend="${order != null and order.status == 'paid'} ? '' : 'gray'">4</div>
-        <div class="step-text" th:classappend="${order != null and order.status == 'paid'} ? '' : 'gray'">影院取票观影</div>
-    </div>
-</div>
-
 <div class="container" th:if="${order != null}"
-     th:attr="data-order-id=${order.id}" id="orderWrap">
+     th:attr="data-order-id=${order.id},
+              data-create-time=${order.createTime}"
+     id="orderWrap">
 
     <!-- 待支付 -->
     <div th:if="${order.status == 'pending'}">
-        <div class="tip-box">
+        <!-- 倒计时提示框 -->
+        <div class="tip-box" id="tipBox">
             <div class="tip-icon">⏳</div>
             <div>
-                <div class="tip-title">请在 15 分钟内完成支付</div>
+                <div class="tip-title" id="tipTitle">请在 <span class="num" id="countdown">10:00</span> 内完成支付</div>
                 <div class="tip-sub">超时订单会自动取消，如遇支付问题，请致电猫眼客服：1010-5335</div>
             </div>
         </div>
@@ -177,7 +154,52 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!wrap) return;
 
     const orderId = wrap.dataset.orderId;
+    const createTimeStr = wrap.dataset.createTime;
     const payBtn = document.getElementById('payBtn');
+
+    // ==================== 10 分钟倒计时 ====================
+    const countdownEl = document.getElementById('countdown');
+    const tipBox = document.getElementById('tipBox');
+    const tipTitle = document.getElementById('tipTitle');
+
+    if (countdownEl && createTimeStr) {
+        // "2026-09-23 10:34:56" → "2026/09/23 10:34:56"
+        // Safari 只接受斜杠格式，必须替换
+        const safeTimeStr = createTimeStr.replace(/-/g, '/');
+        const createTime = new Date(safeTimeStr).getTime();
+        const DEADLINE = createTime + 10 * 60 * 1000; // 10 分钟截止
+
+        let timer = null;
+
+        function updateCountdown() {
+            const now = Date.now();
+            const remain = DEADLINE - now;
+
+            if (remain <= 0) {
+                // 已超时
+                clearInterval(timer);
+                countdownEl.textContent = '00:00';
+                tipBox.classList.add('timeout');
+                tipTitle.innerHTML = '订单已超时';
+                if (payBtn) {
+                    payBtn.disabled = true;
+                    payBtn.textContent = '订单已超时';
+                }
+                return;
+            }
+
+            // 转成 mm:ss 显示
+            const totalSec = Math.floor(remain / 1000);
+            const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
+            const sec = String(totalSec % 60).padStart(2, '0');
+            countdownEl.textContent = min + ':' + sec;
+        }
+
+        updateCountdown();               // 页面加载立即渲染一次
+        timer = setInterval(updateCountdown, 1000);
+    }
+
+    // ==================== 支付按钮 ====================
     if (!payBtn) return;
 
     payBtn.addEventListener('click', function () {
