@@ -1,0 +1,6 @@
+index.html
+  └─ 点海报 → /movie/detail/{id} → PageController.movieDetail() → movie-detail.html
+       └─ 点"特惠购票" → /cinemas/{movieId} → PageController.cinemas() → cinemas.html
+            └─ 点"选座购票" → /seat/{scheduleId} → PageController.seat() → seat.html
+                 └─ 点"确认选座" → POST /api/orders → 跳 /order/{id} → order-detail.html
+                      └─ 点"确认支付" → POST /api/orders/{id}/pay → 显示取票码
