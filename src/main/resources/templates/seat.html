@@ -300,7 +300,6 @@
                     return data;
                 }))
                 .then(order => {
-                    // 静默跳转到支付页
                     window.location.href = '/order/' + order.id;
                 })
                 .catch(err => {

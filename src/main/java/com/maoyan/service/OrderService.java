@@ -21,13 +21,9 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * 订单业务：锁座下单 + 模拟支付 + 超时取消
- */
 @Service
 public class OrderService {
 
-    /** 支付超时时间：10 分钟 */
     private static final int PAY_TIMEOUT_MINUTES = 10;
 
     private static final DateTimeFormatter DTF =
@@ -40,7 +36,6 @@ public class OrderService {
     @Autowired private ScheduleRepository scheduleRepository;
     @Autowired private MovieRepository movieRepository;
 
-    // ==================== 1. 锁座 + 创建待支付订单 ====================
     @Transactional
     public Order createOrder(Long scheduleId, List<String> seatLabels) {
         if (scheduleId == null) {
@@ -93,7 +88,6 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 2. 模拟支付 ====================
     @Transactional
     public Order pay(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -120,7 +114,6 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 3. 手动取消订单 ====================
     @Transactional
     public Order cancel(Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -135,12 +128,10 @@ public class OrderService {
 
         order.setStatus("cancelled");
         orderRepository.save(order);
-
         releaseSeats(order.getId());
         return order;
     }
 
-    // ==================== 4. 定时扫描并取消超时订单 ====================
     @Scheduled(fixedRate = 30_000)
     @Transactional
     public void cancelExpiredOrders() {
@@ -173,7 +164,6 @@ public class OrderService {
         }
     }
 
-    /** 释放订单占用的座位 */
     private void releaseSeats(Long orderId) {
         List<Seat> seats = seatRepository.findByOrderId(orderId);
         for (Seat seat : seats) {
@@ -182,8 +172,6 @@ public class OrderService {
         }
         seatRepository.saveAll(seats);
     }
-
-    // ==================== 工具方法 ====================
 
     private int[] parseSeatLabel(String label) {
         Matcher m = SEAT_LABEL.matcher(label == null ? "" : label.trim());

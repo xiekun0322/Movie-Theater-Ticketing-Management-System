@@ -1,0 +1,9 @@
+com\maoyan\config\DataInitializer.class
+com\maoyan\controller\MovieController.class
+com\maoyan\controller\PageController.class
+com\maoyan\entity\Schedule.class
+com\maoyan\repository\ScheduleRepository.class
+com\maoyan\controller\ScheduleController.class
+com\maoyan\MovieTicketingApplication.class
+com\maoyan\repository\MovieRepository.class
+com\maoyan\entity\Movie.class

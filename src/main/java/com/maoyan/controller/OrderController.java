@@ -11,9 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 订单接口：创建 / 支付 / 取消 / 查询
- */
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin
@@ -24,7 +21,7 @@ public class OrderController {
 
     @GetMapping
     public List<Order> list() {
-        return orderRepository.findAll();
+        return orderRepository.findAllByOrderByIdDesc();
     }
 
     @GetMapping("/{id}")

@@ -1,26 +1,33 @@
-package com.maoyan.entity; // 声明当前类所在的包
+package com.maoyan.entity;
 
-import jakarta.persistence.*; // 导入 JPA 注解
-import lombok.Data; // 导入 Lombok 的 @Data
+import jakarta.persistence.*;
+import lombok.Data;
 
-/**
- * 电影实体类
- * 对应数据库中的 movie 表
- */
-@Data // Lombok 自动生成 getter/setter/toString
-@Entity // 声明为 JPA 实体
-@Table(name = "movie") // 指定映射的表名
+@Data
+@Entity
+@Table(name = "movie")
 public class Movie {
 
-    @Id // 主键
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // 自增
-    private Long id; // 电影 ID
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String title;       // 电影名称
-    private String poster;      // 海报（渐变色 CSS 字符串）
-    private Double score;       // 评分
-    private String tag;         // 标签（如 2DIMAX、3D）
-    private String releaseDate; // 上映日期
-    private String status;      // 状态：showing（正在热映）/ upcoming（即将上映）
-    private Integer wantCount;  // 想看人数
+    @Column(length = 100)
+    private String title;
+
+    @Column(length = 500)  // 防止渐变色字符串过长
+    private String poster;
+
+    private Double score;
+
+    @Column(length = 50)
+    private String tag;
+
+    @Column(length = 50)
+    private String releaseDate;
+
+    @Column(length = 20)   // showing / upcoming
+    private String status;
+
+    private Integer wantCount;
 }

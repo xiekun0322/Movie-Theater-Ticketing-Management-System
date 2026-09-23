@@ -3,10 +3,6 @@ package com.maoyan.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-/**
- * 订单实体
- * 注意：order 是 MySQL 保留字，表名用 t_order
- */
 @Data
 @Entity
 @Table(name = "t_order")

@@ -9,9 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 座位接口：给前端选座页提供 JSON 座位图
- */
 @RestController
 @RequestMapping("/api/seats")
 @CrossOrigin
