@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>支付 - 猫眼电影</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #fff; color: #333; font-size: 14px; }
+        a { text-decoration: none; color: inherit; }
+        ul, li { list-style: none; }
+
+        .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; padding: 0 15%; }
+        .logo { display: flex; align-items: center; margin-right: 40px; }
+        .logo-icon { width: 40px; height: 40px; background: #ef4238; border-radius: 50%; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
+        .logo-text { font-size: 20px; font-weight: bold; }
+        .main-menu { display: flex; height: 100%; }
+        .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
+        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+        .nav-right > div { cursor: pointer; }
+
+        .container { width: 900px; margin: 40px auto 60px; }
+
+        /* 倒计时提示区 */
+        .tip-box { background: #fef0f0; padding: 20px 30px; border-radius: 4px; display: flex; align-items: center; margin-bottom: 30px; }
+        .tip-icon { font-size: 32px; margin-right: 20px; color: #ef4238; }
+        .tip-title { font-size: 18px; color: #ef4238; font-weight: bold; margin-bottom: 6px; }
+        .tip-title .num { color: #ef4238; font-size: 22px; font-weight: bold; }
+        .tip-sub { font-size: 13px; color: #999; }
+        .tip-box.timeout { background: #f0f0f0; }
+        .tip-box.timeout .tip-icon,
+        .tip-box.timeout .tip-title { color: #999; }
+
+        .warning { color: #ff9800; font-size: 13px; margin-bottom: 15px; }
+
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .info-table th { background: #fafafa; padding: 12px; font-weight: normal; color: #999; font-size: 14px; text-align: center; border-bottom: 1px solid #e5e5e5; }
+        .info-table td { padding: 20px 12px; text-align: center; font-size: 14px; }
+
+        .total-row { text-align: right; font-size: 16px; margin-bottom: 30px; }
+        .total-row .num { color: #ef4238; font-size: 30px; font-weight: bold; }
+        .total-row .num::before { content: '¥'; font-size: 18px; }
+
+        .pay-btn { display: block; margin: 0 auto; background: #ef4238; color: #fff; padding: 14px 80px; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; }
+        .pay-btn:hover { background: #d6382f; }
+        .pay-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .paid-card { border: 2px dashed #43a047; background: #f0fff4; border-radius: 8px; padding: 40px; text-align: center; margin-bottom: 30px; }
+        .paid-card .check-icon { font-size: 48px; color: #43a047; margin-bottom: 15px; }
+        .paid-card .paid-title { font-size: 20px; color: #2e7d32; font-weight: bold; margin-bottom: 10px; }
+        .paid-card .ticket-label { font-size: 14px; color: #43a047; margin-bottom: 10px; }
+        .paid-card .ticket-code { font-size: 40px; letter-spacing: 6px; font-weight: bold; color: #2e7d32; margin-bottom: 15px; }
+        .paid-card .paid-sub { font-size: 13px; color: #888; }
+
+        .back-orders { text-align: center; margin-top: 20px; }
+        .back-orders a { display: inline-block; background: #fff; color: #ef4238; border: 1px solid #ef4238; padding: 10px 30px; border-radius: 4px; font-size: 14px; transition: background 0.3s; }
+        .back-orders a:hover { background: #fff5f4; }
+
+        .footer { background: #262426; color: #999; padding: 40px 0; font-size: 12px; line-height: 2; text-align: center; }
+        .footer a { color: #ef4238; }
+    </style>
+</head>
+<body>
+
+<header class="top-nav">
+    <div class="logo">
+        <div class="logo-icon">猫</div>
+        <div class="logo-text">猫眼电影</div>
+    </div>
+    <ul class="main-menu">
+        <li><a th:href="@{/}">首页</a></li>
+        <li><a th:href="@{/}">电影</a></li>
+        <li><a th:href="@{/}">影院</a></li>
+        <li><a href="#">演出</a></li>
+    </ul>
+    <div class="nav-right">
+        <div>📱 APP下载 ▼</div>
+        <a th:href="@{/orders}"><div style="color:#ef4238;">🎟️ 我的订单</div></a>
+        <div>👤 ▼</div>
+    </div>
+</header>
+
+<div class="container" th:if="${order != null}"
+     th:attr="data-order-id=${order.id},
+              data-create-time=${order.createTime}"
+     id="orderWrap">
+
+    <!-- 待支付 -->
+    <div th:if="${order.status == 'pending'}">
+        <div class="tip-box" id="tipBox">
+            <div class="tip-icon">⏳</div>
+            <div>
+                <div class="tip-title" id="tipTitle">请在 <span class="num" id="countdown">10:00</span> 内完成支付</div>
+                <div class="tip-sub">超时订单会自动取消，如遇支付问题，请致电猫眼客服：1010-5335</div>
+            </div>
+        </div>
+
+        <div class="warning">⚠️ 请仔细核对场次信息，出票后将无法退票和改签</div>
+
+        <table class="info-table">
+            <thead>
+            <tr><th>影片</th><th>时间</th><th>影院</th><th>座位</th></tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>《<span th:text="${order.movieTitle}">-</span>》</td>
+                <td th:text="${order.showTime}">-</td>
+                <td th:text="${order.cinemaName}">-</td>
+                <td th:text="${order.seats}">-</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="total-row">实际支付：<span class="num" th:text="${order.totalPrice}">0</span></div>
+
+        <button class="pay-btn" id="payBtn">确认支付</button>
+    </div>
+
+    <!-- 已支付 -->
+    <div th:if="${order.status == 'paid'}">
+        <div class="paid-card">
+            <div class="check-icon">✓</div>
+            <div class="paid-title">支付成功</div>
+            <div class="ticket-label">取 票 码</div>
+            <div class="ticket-code" th:text="${order.ticketCode}">ABCD-1234</div>
+            <div class="paid-sub">请凭取票码到影院自助取票机取票</div>
+        </div>
+
+        <table class="info-table">
+            <thead>
+            <tr><th>影片</th><th>时间</th><th>影院</th><th>座位</th></tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>《<span th:text="${order.movieTitle}">-</span>》</td>
+                <td th:text="${order.showTime}">-</td>
+                <td th:text="${order.cinemaName}">-</td>
+                <td th:text="${order.seats}">-</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div class="total-row">已支付：<span class="num" th:text="${order.totalPrice}">0</span></div>
+
+        <div class="back-orders">
+            <a th:href="@{/orders}">查看我的订单</a>
+        </div>
+    </div>
+
+    <!-- 已取消 -->
+    <div th:if="${order.status == 'cancelled'}" style="text-align:center;padding:60px 0;color:#999;">
+        <div style="font-size:48px;margin-bottom:20px;">✕</div>
+        <div style="font-size:20px;">订单已取消</div>
+        <div class="back-orders">
+            <a th:href="@{/orders}">返回我的订单</a>
+        </div>
+    </div>
+</div>
+
+<div class="container" th:if="${order == null}" style="text-align:center;padding:80px 0;color:#999;">
+    订单不存在，<a th:href="@{/}" style="color:#ef4238;">返回首页</a>
+</div>
+
+<footer class="footer">
+    <div>关于猫眼：<a href="#">关于我们</a> | <a href="#">董事会成员</a></div>
+    <div>©2026 猫眼电影 www.maoyan.com</div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const wrap = document.getElementById('orderWrap');
+    if (!wrap) return;
+
+    const orderId = wrap.dataset.orderId;
+    const createTimeStr = wrap.dataset.createTime;
+    const payBtn = document.getElementById('payBtn');
+
+    // ==================== 10 分钟倒计时 ====================
+    const countdownEl = document.getElementById('countdown');
+    const tipBox = document.getElementById('tipBox');
+    const tipTitle = document.getElementById('tipTitle');
+
+    if (countdownEl && createTimeStr) {
+        const safeTimeStr = createTimeStr.replace(/-/g, '/');
+        const createTime = new Date(safeTimeStr).getTime();
+        const DEADLINE = createTime + 10 * 60 * 1000;
+
+        let timer = null;
+
+        function updateCountdown() {
+            const now = Date.now();
+            const remain = DEADLINE - now;
+
+            if (remain <= 0) {
+                clearInterval(timer);
+                countdownEl.textContent = '00:00';
+                tipBox.classList.add('timeout');
+                tipTitle.innerHTML = '订单已超时';
+                if (payBtn) {
+                    payBtn.disabled = true;
+                    payBtn.textContent = '订单已超时';
+                }
+                return;
+            }
+
+            const totalSec = Math.floor(remain / 1000);
+            const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
+            const sec = String(totalSec % 60).padStart(2, '0');
+            countdownEl.textContent = min + ':' + sec;
+        }
+
+        updateCountdown();
+        timer = setInterval(updateCountdown, 1000);
+    }
+
+    // ==================== 支付按钮（无 confirm 弹窗） ====================
+    if (!payBtn) return;
+
+    payBtn.addEventListener('click', function () {
+        payBtn.disabled = true;
+        payBtn.textContent = '支付中...';
+
+        fetch('/api/orders/' + orderId + '/pay', { method: 'POST' })
+            .then(res => res.json().then(data => {
+                if (!res.ok) throw new Error(data.message || '支付失败');
+                return data;
+            }))
+            .then(order => {
+                // 静默刷新，页面自动显示取票码
+                window.location.reload();
+            })
+            .catch(err => {
+                alert(err.message);
+                payBtn.disabled = false;
+                payBtn.textContent = '确认支付';
+            });
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+首页 (/)
+  └─ 点电影海报 → /movie/detail/{id}
+       └─ 点"特惠购票" → /cinemas/{movieId}
+            └─ 点"选座购票" → /seat/{scheduleId}
+                 └─ 选座 → 点"确认选座" → POST /api/orders
+                      └─ 静默跳转 → /order/{id}     ← 支付页
+                           └─ 点"确认支付" → POST /api/orders/{id}/pay
+                                └─ 刷新 → 显示绿色取票码 ✓
+
+我的订单 (/orders)                                ← 新增
+  ├─ 待支付卡片 → 点"去支付" → /order/{id}
+  └─ 已支付卡片 → 点"查看票券" → /order/{id} → 显示取票码

@@ -1,0 +1,25 @@
+com.maoyan
+  ├─ config
+  │    └─ DataInitializer.java
+  ├─ controller
+  │    ├─ MovieController.java
+  │    ├─ OrderController.java
+  │    ├─ PageController.java
+  │    ├─ ScheduleController.java
+  │    └─ SeatController.java
+  ├─ dto                          ← 注意是 dto，不是 dot
+  │    ├─ CreateOrderRequest.java
+  │    └─ SeatVO.java
+  ├─ entity
+  │    ├─ Movie.java
+  │    ├─ Order.java
+  │    ├─ Schedule.java
+  │    └─ Seat.java
+  ├─ repository
+  │    ├─ MovieRepository.java
+  │    ├─ OrderRepository.java
+  │    ├─ ScheduleRepository.java
+  │    └─ SeatRepository.java
+  ├─ service                      ← OrderService 应该在这里
+  │    └─ OrderService.java
+  └─ MovieTicketingApplication.java

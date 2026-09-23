@@ -9,56 +9,28 @@
         a { text-decoration: none; color: inherit; }
         ul, li { list-style: none; }
 
-        /* 顶部导航 */
-        .top-nav {
-            height: 80px; border-bottom: 1px solid #e5e5e5;
-            display: flex; align-items: center; padding: 0 15%;
-            position: sticky; top: 0; background: #fff; z-index: 100;
-        }
+        .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; padding: 0 15%; position: sticky; top: 0; background: #fff; z-index: 100; }
         .logo { display: flex; align-items: center; margin-right: 40px; }
-        .logo-icon {
-            width: 40px; height: 40px; background: #ef4238; border-radius: 50%;
-            color: #fff; display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 18px; margin-right: 10px;
-        }
+        .logo-icon { width: 40px; height: 40px; background: #ef4238; border-radius: 50%; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
         .logo-text { font-size: 20px; font-weight: bold; }
         .city-select { font-size: 14px; margin-right: 30px; }
         .main-menu { display: flex; height: 100%; }
         .main-menu li { height: 100%; }
-        .main-menu li a {
-            display: flex; align-items: center; height: 100%;
-            padding: 0 20px; font-size: 16px; color: #333;
-        }
+        .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
         .main-menu li.active a { background: #ef4238; color: #fff; }
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
-        /* 电影信息条 */
-        .movie-header {
-            background: linear-gradient(to right, #2c1e4a, #4a3b6b);
-            color: #fff; padding: 40px 0;
-        }
+        .movie-header { background: linear-gradient(to right, #2c1e4a, #4a3b6b); color: #fff; padding: 40px 0; }
         .movie-header-content { width: 1200px; margin: 0 auto; display: flex; align-items: flex-start; }
-        .movie-poster {
-            width: 200px; height: 280px; margin-right: 30px;
-            border-radius: 4px; overflow: hidden; flex-shrink: 0;
-            background: #1a1a1a; position: relative;
-        }
+        .movie-poster { width: 200px; height: 280px; margin-right: 30px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #1a1a1a; position: relative; }
         .movie-poster .poster-img { width: 100%; height: 100%; background-size: cover; }
-        .poster-tag {
-            position: absolute; top: 8px; left: 8px;
-            background: #2b8eff; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 2px;
-        }
+        .poster-tag { position: absolute; top: 8px; left: 8px; background: #2b8eff; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 2px; }
         .movie-info { flex: 1; }
         .movie-title { font-size: 26px; font-weight: bold; margin-bottom: 8px; }
         .movie-meta { font-size: 14px; color: #ccc; margin-bottom: 6px; }
         .movie-actions { display: flex; gap: 15px; margin: 15px 0; }
-        .action-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff; padding: 8px 20px; border-radius: 4px;
-            cursor: pointer; font-size: 14px;
-        }
+        .action-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
         .movie-stats { text-align: right; margin-left: auto; flex-shrink: 0; }
         .rating-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
         .rating-score { font-size: 36px; color: #ffb400; font-weight: bold; line-height: 1; }
@@ -67,28 +39,16 @@
         .box-office-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
         .box-office-value { font-size: 24px; color: #fff; font-weight: bold; }
 
-        /* 筛选区 */
-        .filter-section {
-            width: 1200px; margin: 0 auto; padding: 20px 0;
-            border-bottom: 1px solid #e5e5e5;
-        }
+        .filter-section { width: 1200px; margin: 0 auto; padding: 20px 0; border-bottom: 1px solid #e5e5e5; }
         .filter-row { display: flex; align-items: flex-start; margin-bottom: 12px; }
         .filter-row:last-child { margin-bottom: 0; }
-        .filter-label {
-            width: 70px; color: #999; font-size: 14px;
-            flex-shrink: 0; padding-top: 5px;
-        }
+        .filter-label { width: 70px; color: #999; font-size: 14px; flex-shrink: 0; padding-top: 5px; }
         .filter-options { display: flex; flex-wrap: wrap; gap: 10px; }
-        .filter-option {
-            padding: 5px 14px; border-radius: 20px;
-            cursor: pointer; font-size: 14px;
-            transition: all 0.3s;
-        }
+        .filter-option { padding: 5px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all 0.3s; }
         .filter-option.active { background: #ef4238; color: #fff; }
         .filter-option:hover { background: #f0f0f0; }
         .filter-option.active:hover { background: #ef4238; }
 
-        /* 影院列表 */
         .cinema-list-section { width: 1200px; margin: 0 auto; padding: 20px 0 60px; }
         .cinema-item { border-bottom: 1px dashed #e5e5e5; padding: 20px 0; }
         .cinema-item:last-child { border-bottom: none; }
@@ -97,40 +57,20 @@
         .cinema-name { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
         .cinema-address { font-size: 14px; color: #999; margin-bottom: 10px; }
         .cinema-tags { display: flex; gap: 10px; }
-        .cinema-tag {
-            font-size: 12px; color: #2b8eff;
-            border: 1px solid #2b8eff; padding: 2px 5px; border-radius: 3px;
-        }
-        .cinema-buy {
-            display: flex; flex-direction: column;
-            align-items: flex-end; margin-left: 20px;
-        }
+        .cinema-tag { font-size: 12px; color: #2b8eff; border: 1px solid #2b8eff; padding: 2px 5px; border-radius: 3px; }
+        .cinema-buy { display: flex; flex-direction: column; align-items: flex-end; margin-left: 20px; }
         .price-info { color: #ef4238; font-size: 14px; margin-bottom: 5px; }
         .price-info span { font-size: 22px; font-weight: bold; }
         .distance-info { font-size: 12px; color: #999; margin-bottom: 10px; }
-        .buy-btn {
-            background: #ef4238; color: #fff;
-            padding: 8px 20px; border-radius: 4px;
-            cursor: pointer; font-size: 14px; border: none;
-            transition: background 0.3s;
-        }
+        .buy-btn { background: #ef4238; color: #fff; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; border: none; transition: background 0.3s; }
         .buy-btn:hover { background: #d6382f; }
 
         .no-schedule { text-align: center; padding: 60px 0; color: #999; }
 
-        .footer {
-            background: #262426; color: #999; padding: 40px 0;
-            margin-top: 60px; font-size: 12px; line-height: 2; text-align: center;
-        }
+        .footer { background: #262426; color: #999; padding: 40px 0; margin-top: 60px; font-size: 12px; line-height: 2; text-align: center; }
         .footer a { color: #ef4238; margin: 0 5px; }
 
-        .floating-ad {
-            position: fixed; bottom: 20px; left: 20px;
-            width: 160px; height: 200px; background: #ef4238; border-radius: 10px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            color: #fff; font-size: 12px; z-index: 1000; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        .floating-ad { position: fixed; bottom: 20px; left: 20px; width: 160px; height: 200px; background: #ef4238; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 12px; z-index: 1000; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .qr-placeholder { width: 100px; height: 100px; background: #fff; margin-top: 10px; border-radius: 5px; }
     </style>
 </head>
@@ -150,11 +90,11 @@
         </ul>
         <div class="nav-right">
             <div>📱 APP下载 ▼</div>
+            <a th:href="@{/orders}"><div style="color:#ef4238;">🎟️ 我的订单</div></a>
             <div>👤 ▼</div>
         </div>
     </header>
 
-    <!-- 电影信息条 -->
     <div class="movie-header">
         <div class="movie-header-content">
             <div class="movie-poster">
@@ -188,7 +128,6 @@
         </div>
     </div>
 
-    <!-- 筛选 -->
     <div class="filter-section">
         <div class="filter-row">
             <div class="filter-label">日期:</div>
@@ -228,7 +167,6 @@
         </div>
     </div>
 
-    <!-- 影院列表 -->
     <div class="cinema-list-section">
         <div class="no-schedule" th:if="${schedules == null or schedules.isEmpty()}">
             <h2>暂无场次信息</h2>
@@ -252,7 +190,6 @@
                 <div class="cinema-buy">
                     <div class="price-info">¥<span th:text="${s.price}">0</span>起</div>
                     <div class="distance-info" th:text="${s.date}">日期</div>
-                    <!-- ★ 点选座购票 → 跳选座页 -->
                     <a th:href="@{/seat/{id}(id=${s.id})}" class="buy-btn">选座购票</a>
                 </div>
             </div>
@@ -271,7 +208,6 @@
     </div>
 
     <script>
-        // 筛选按钮切换
         document.querySelectorAll('.filter-option').forEach(function (option) {
             option.addEventListener('click', function () {
                 var group = this.dataset.filter;

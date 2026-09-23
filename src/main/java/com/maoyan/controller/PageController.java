@@ -3,6 +3,7 @@ package com.maoyan.controller; // 声明当前类所在的包
 import com.maoyan.entity.Movie; // 导入 Movie 实体
 import com.maoyan.entity.Schedule; // 导入 Schedule 实体
 import com.maoyan.repository.MovieRepository; // 导入电影仓库
+import com.maoyan.repository.OrderRepository; // 导入订单仓库
 import com.maoyan.repository.ScheduleRepository; // 导入场次仓库
 import org.springframework.beans.factory.annotation.Autowired; // 导入 @Autowired
 import org.springframework.stereotype.Controller; // 导入 @Controller
@@ -15,45 +16,37 @@ import java.util.List; // 导入 List
 
 /**
  * 页面跳转控制器
- * 负责所有页面的路由跳转，返回视图名，由 Thymeleaf 渲染 HTML
  */
-@Controller // 页面控制器（不是 @RestController）
+@Controller
 public class PageController {
 
     @Autowired
-    private MovieRepository movieRepository; // 电影仓库
+    private MovieRepository movieRepository;
 
     @Autowired
-    private ScheduleRepository scheduleRepository; // 场次仓库
+    private ScheduleRepository scheduleRepository;
 
-    /** 诊断接口：验证 Controller 是否被扫描 */
+    @Autowired
+    private OrderRepository orderRepository;
+
+    /** 诊断接口 */
     @GetMapping("/test")
     @ResponseBody
     public String test() {
         return "PageController 工作正常";
     }
 
-    /**
-     * 首页
-     * 访问：GET /
-     * 返回：templates/index.html
-     */
+    /** 首页 */
     @GetMapping("/")
     public String index(Model model) {
-        // 查询正在热映
         List<Movie> showingMovies = movieRepository.findByStatus("showing");
-        // 查询即将上映
         List<Movie> upcomingMovies = movieRepository.findByStatus("upcoming");
         model.addAttribute("showingMovies", showingMovies);
         model.addAttribute("upcomingMovies", upcomingMovies);
         return "index";
     }
 
-    /**
-     * 电影详情页
-     * 访问：GET /movie/detail/{id}
-     * 返回：templates/movie-detail.html
-     */
+    /** 电影详情页 */
     @GetMapping("/movie/detail/{id}")
     public String movieDetail(@PathVariable Long id, Model model) {
         Movie movie = movieRepository.findById(id).orElse(null);
@@ -61,31 +54,40 @@ public class PageController {
         return "movie-detail";
     }
 
-    /**
-     * 选影院/选场次页
-     * 访问：GET /cinemas/{movieId}
-     * 返回：templates/cinemas.html
-     */
+    /** 选影院/选场次页 */
     @GetMapping("/cinemas/{movieId}")
     public String cinemas(@PathVariable Long movieId, Model model) {
-        // 查询电影信息
         Movie movie = movieRepository.findById(movieId).orElse(null);
-        // 查询该电影的所有场次
         List<Schedule> schedules = scheduleRepository.findByMovieId(movieId);
         model.addAttribute("movie", movie);
         model.addAttribute("schedules", schedules);
         return "cinemas";
     }
 
-    /**
-     * 选座页
-     * 访问：GET /seat/{scheduleId}
-     * 返回：templates/seat.html
-     */
+    /** 选座页 */
     @GetMapping("/seat/{scheduleId}")
     public String seat(@PathVariable Long scheduleId, Model model) {
         Schedule schedule = scheduleRepository.findById(scheduleId).orElse(null);
         model.addAttribute("schedule", schedule);
+
+        if (schedule != null) {
+            Movie movie = movieRepository.findById(schedule.getMovieId()).orElse(null);
+            model.addAttribute("movie", movie);
+        }
         return "seat";
+    }
+
+    /** 订单详情 / 支付页 */
+    @GetMapping("/order/{id}")
+    public String orderDetail(@PathVariable Long id, Model model) {
+        model.addAttribute("order", orderRepository.findById(id).orElse(null));
+        return "movie-order";
+    }
+
+    /** 我的订单 / 票券列表页（新增） */
+    @GetMapping("/orders")
+    public String orders(Model model) {
+        model.addAttribute("orders", orderRepository.findAllByOrderByIdDesc());
+        return "orders";
     }
 }

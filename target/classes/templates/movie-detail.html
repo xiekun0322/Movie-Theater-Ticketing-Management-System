@@ -9,65 +9,28 @@
         a { text-decoration: none; color: inherit; }
         ul, li { list-style: none; }
 
-        /* 顶部导航 */
-        .top-nav {
-            height: 80px; border-bottom: 1px solid #e5e5e5;
-            display: flex; align-items: center; padding: 0 15%;
-            position: sticky; top: 0; background: #fff; z-index: 100;
-        }
+        .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; padding: 0 15%; position: sticky; top: 0; background: #fff; z-index: 100; }
         .logo { display: flex; align-items: center; margin-right: 40px; }
-        .logo-icon {
-            width: 40px; height: 40px; background: #ef4238; border-radius: 50%;
-            color: #fff; display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 18px; margin-right: 10px;
-        }
+        .logo-icon { width: 40px; height: 40px; background: #ef4238; border-radius: 50%; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
         .logo-text { font-size: 20px; font-weight: bold; }
         .main-menu { display: flex; height: 100%; }
         .main-menu li { height: 100%; }
-        .main-menu li a {
-            display: flex; align-items: center; height: 100%;
-            padding: 0 20px; font-size: 16px; color: #333;
-        }
+        .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
         .main-menu li.active a { color: #ef4238; }
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
-        /* 电影头部 */
-        .movie-header {
-            background: linear-gradient(to right, #2c1e4a, #4a3b6b);
-            color: #fff; padding: 40px 0;
-        }
-        .movie-header-content {
-            width: 1200px; margin: 0 auto; display: flex; align-items: flex-start;
-        }
-        .movie-poster {
-            width: 240px; height: 340px; margin-right: 30px;
-            border-radius: 4px; overflow: hidden; flex-shrink: 0;
-            background: #1a1a1a; position: relative;
-        }
+        .movie-header { background: linear-gradient(to right, #2c1e4a, #4a3b6b); color: #fff; padding: 40px 0; }
+        .movie-header-content { width: 1200px; margin: 0 auto; display: flex; align-items: flex-start; }
+        .movie-poster { width: 240px; height: 340px; margin-right: 30px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #1a1a1a; position: relative; }
         .movie-poster .poster-img { width: 100%; height: 100%; background-size: cover; }
-        .poster-tag {
-            position: absolute; top: 8px; left: 8px;
-            background: #2b8eff; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 2px;
-        }
+        .poster-tag { position: absolute; top: 8px; left: 8px; background: #2b8eff; color: #fff; font-size: 11px; padding: 2px 6px; border-radius: 2px; }
         .movie-info { flex: 1; }
         .movie-title { font-size: 28px; font-weight: bold; margin-bottom: 8px; }
         .movie-meta { font-size: 14px; color: #ccc; margin-bottom: 6px; }
         .movie-actions { display: flex; gap: 15px; margin: 20px 0; }
-        .action-btn {
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: #fff; padding: 8px 20px; border-radius: 4px;
-            cursor: pointer; font-size: 14px;
-        }
-        /* ★ 购票按钮 */
-        .buy-ticket-btn {
-            display: inline-block;
-            background: #ef4238; color: #fff;
-            padding: 12px 40px; border-radius: 4px;
-            font-size: 16px; font-weight: bold;
-            cursor: pointer; transition: background 0.3s;
-        }
+        .action-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .buy-ticket-btn { display: inline-block; background: #ef4238; color: #fff; padding: 12px 40px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
         .buy-ticket-btn:hover { background: #d6382f; }
         .movie-stats { text-align: right; margin-left: auto; flex-shrink: 0; }
         .rating-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
@@ -77,11 +40,7 @@
         .box-office-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
         .box-office-value { font-size: 24px; color: #fff; font-weight: bold; }
 
-        /* 主体 */
-        .container {
-            width: 1200px; margin: 0 auto; padding: 30px 0 60px;
-            display: flex; gap: 40px;
-        }
+        .container { width: 1200px; margin: 0 auto; padding: 30px 0 60px; display: flex; gap: 40px; }
         .main-content { flex: 1; }
         .sidebar { width: 320px; flex-shrink: 0; }
 
@@ -89,45 +48,24 @@
         .breadcrumb a { color: #999; }
         .breadcrumb a:hover { color: #ef4238; }
 
-        .tabs {
-            display: flex; border-bottom: 1px solid #e5e5e5;
-            margin-bottom: 25px; gap: 30px;
-        }
-        .tab-item {
-            padding: 10px 0; font-size: 16px; cursor: pointer;
-            color: #333; border-bottom: 2px solid transparent;
-        }
+        .tabs { display: flex; border-bottom: 1px solid #e5e5e5; margin-bottom: 25px; gap: 30px; }
+        .tab-item { padding: 10px 0; font-size: 16px; cursor: pointer; color: #333; border-bottom: 2px solid transparent; }
         .tab-item.active { color: #ef4238; border-bottom-color: #ef4238; }
 
         .section-title { display: flex; align-items: center; margin-bottom: 15px; }
-        .section-title::before {
-            content: ''; display: inline-block;
-            width: 4px; height: 18px; background: #ef4238;
-            margin-right: 8px; border-radius: 2px;
-        }
+        .section-title::before { content: ''; display: inline-block; width: 4px; height: 18px; background: #ef4238; margin-right: 8px; border-radius: 2px; }
         .section-title h3 { font-size: 18px; font-weight: bold; }
         .section-title .more { margin-left: auto; font-size: 13px; color: #999; cursor: pointer; }
 
-        .plot-summary {
-            font-size: 14px; line-height: 1.9; color: #333;
-            text-indent: 2em; margin-bottom: 40px;
-        }
+        .plot-summary { font-size: 14px; line-height: 1.9; color: #333; text-indent: 2em; margin-bottom: 40px; }
 
         .cast-list { display: flex; gap: 30px; margin-bottom: 40px; flex-wrap: wrap; }
         .cast-item { text-align: center; width: 100px; }
-        .cast-avatar {
-            width: 100px; height: 100px; border-radius: 4px;
-            margin-bottom: 8px; background: #f0f0f0;
-        }
+        .cast-avatar { width: 100px; height: 100px; border-radius: 4px; margin-bottom: 8px; background: #f0f0f0; }
         .cast-name { font-size: 14px; margin-bottom: 3px; }
         .cast-role { font-size: 12px; color: #999; }
 
-        .gallery {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr;
-            gap: 8px; margin-bottom: 40px; height: 320px;
-        }
+        .gallery { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; margin-bottom: 40px; height: 320px; }
         .gallery-item { overflow: hidden; border-radius: 4px; background: #f0f0f0; }
         .gallery-item:first-child { grid-row: span 2; }
 
@@ -137,47 +75,26 @@
         .fact-value { font-size: 14px; }
 
         .box-office-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .box-office-card {
-            background: #f8f8f8; border-radius: 4px;
-            padding: 25px 20px; text-align: center;
-        }
+        .box-office-card { background: #f8f8f8; border-radius: 4px; padding: 25px 20px; text-align: center; }
         .box-office-card .value { font-size: 28px; color: #ef4238; font-weight: bold; margin-bottom: 8px; }
         .box-office-card .label { font-size: 13px; color: #999; }
 
         .sidebar-section { margin-bottom: 30px; }
-        .sidebar-title {
-            font-size: 16px; font-weight: bold; margin-bottom: 15px;
-            display: flex; align-items: center;
-        }
-        .sidebar-title::before {
-            content: ''; display: inline-block;
-            width: 3px; height: 16px; background: #ef4238;
-            margin-right: 8px; border-radius: 2px;
-        }
+        .sidebar-title { font-size: 16px; font-weight: bold; margin-bottom: 15px; display: flex; align-items: center; }
+        .sidebar-title::before { content: ''; display: inline-block; width: 3px; height: 16px; background: #ef4238; margin-right: 8px; border-radius: 2px; }
         .trailer-item { display: flex; gap: 12px; margin-bottom: 15px; cursor: pointer; }
-        .trailer-thumb {
-            width: 120px; height: 68px; border-radius: 4px;
-            overflow: hidden; position: relative; flex-shrink: 0;
-        }
-        .trailer-num {
-            position: absolute; bottom: 0; left: 0;
-            background: #ffb400; color: #fff;
-            font-size: 11px; padding: 1px 5px; font-weight: bold;
-        }
+        .trailer-thumb { width: 120px; height: 68px; border-radius: 4px; overflow: hidden; position: relative; flex-shrink: 0; }
+        .trailer-num { position: absolute; bottom: 0; left: 0; background: #ffb400; color: #fff; font-size: 11px; padding: 1px 5px; font-weight: bold; }
         .trailer-info { flex: 1; }
         .trailer-title { font-size: 13px; line-height: 1.5; margin-bottom: 5px; }
         .trailer-count { font-size: 12px; color: #999; }
 
-        .footer {
-            background: #262426; color: #999; padding: 40px 0;
-            margin-top: 60px; font-size: 12px; line-height: 2; text-align: center;
-        }
+        .footer { background: #262426; color: #999; padding: 40px 0; margin-top: 60px; font-size: 12px; line-height: 2; text-align: center; }
         .footer a { color: #ef4238; margin: 0 5px; }
     </style>
 </head>
 <body>
 
-    <!-- 顶部导航 -->
     <header class="top-nav">
         <div class="logo">
             <div class="logo-icon">猫</div>
@@ -191,11 +108,11 @@
         </ul>
         <div class="nav-right">
             <div>📱 APP下载 ▼</div>
+            <a th:href="@{/orders}"><div style="color:#ef4238;">🎟️ 我的订单</div></a>
             <div>👤 ▼</div>
         </div>
     </header>
 
-    <!-- 电影头部 -->
     <div class="movie-header">
         <div class="movie-header-content">
             <div class="movie-poster">
@@ -212,7 +129,6 @@
                     <button class="action-btn">♡ 想看</button>
                     <button class="action-btn">★ 评分</button>
                 </div>
-                <!-- ★ 购票按钮 → 跳选影院/选场次页 -->
                 <a th:href="@{/cinemas/{id}(id=${movie != null ? movie.id : 0})}" class="buy-ticket-btn">特惠购票</a>
             </div>
             <div class="movie-stats">
@@ -227,7 +143,6 @@
         </div>
     </div>
 
-    <!-- 主体 -->
     <div class="container">
         <main class="main-content">
             <div class="breadcrumb">
