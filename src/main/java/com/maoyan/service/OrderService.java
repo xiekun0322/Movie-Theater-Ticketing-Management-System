@@ -44,15 +44,10 @@ public class OrderService {
     // ==================== 1. 锁座下单 ====================
     @Transactional
     public Order createOrder(Long scheduleId, List<String> seatLabels) {
-        if (scheduleId == null) {
-            throw new BusinessException("场次 ID 不能为空");
-        }
-        if (seatLabels == null || seatLabels.isEmpty()) {
-            throw new BusinessException("请至少选择一个座位");
-        }
-        if (seatLabels.size() > MAX_SEATS_PER_ORDER) {
+        if (scheduleId == null) throw new BusinessException("场次 ID 不能为空");
+        if (seatLabels == null || seatLabels.isEmpty()) throw new BusinessException("请至少选择一个座位");
+        if (seatLabels.size() > MAX_SEATS_PER_ORDER)
             throw new BusinessException("一次最多选择 " + MAX_SEATS_PER_ORDER + " 个座位");
-        }
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
                 .orElseThrow(() -> new BusinessException("场次不存在"));
@@ -63,9 +58,8 @@ public class OrderService {
             Seat seat = seatRepository
                     .findByScheduleIdAndRowNumAndColNum(scheduleId, rc[0], rc[1])
                     .orElseThrow(() -> new BusinessException("座位不存在：" + label));
-            if (!"available".equals(seat.getStatus())) {
+            if (!"available".equals(seat.getStatus()))
                 throw new BusinessException("座位已被选走：" + label);
-            }
             seats.add(seat);
         }
 
@@ -91,9 +85,8 @@ public class OrderService {
         }
         seatRepository.saveAll(seats);
 
-        log.info("创建订单：orderNo={}, scheduleId={}, seats={}",
-                order.getOrderNo(), scheduleId, seatLabels);
-
+        log.info("创建订单成功：orderNo={}, scheduleId={}, seats={}, totalPrice={}",
+                order.getOrderNo(), scheduleId, seatLabels, order.getTotalPrice());
         return order;
     }
 
@@ -102,11 +95,12 @@ public class OrderService {
     public Order pay(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException("订单不存在"));
-
         if ("paid".equals(order.getStatus())) {
+            log.warn("重复支付被拒绝：orderId={}", orderId);
             throw new BusinessException("订单已支付，请勿重复操作");
         }
         if (!"pending".equals(order.getStatus())) {
+            log.warn("非法状态支付被拒绝：orderId={}, status={}", orderId, order.getStatus());
             throw new BusinessException("订单状态不允许支付：" + order.getStatus());
         }
 
@@ -116,13 +110,11 @@ public class OrderService {
         orderRepository.save(order);
 
         List<Seat> seats = seatRepository.findByOrderId(order.getId());
-        for (Seat seat : seats) {
-            seat.setStatus("sold");
-        }
+        for (Seat seat : seats) seat.setStatus("sold");
         seatRepository.saveAll(seats);
 
-        log.info("支付订单：orderId={}, ticketCode={}", orderId, order.getTicketCode());
-
+        log.info("订单支付成功：orderId={}, orderNo={}, ticketCode={}, totalPrice={}",
+                orderId, order.getOrderNo(), order.getTicketCode(), order.getTotalPrice());
         return order;
     }
 
@@ -131,19 +123,14 @@ public class OrderService {
     public Order cancel(Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException("订单不存在"));
-
-        if ("paid".equals(order.getStatus())) {
-            throw new BusinessException("已支付订单不可取消");
-        }
-        if ("cancelled".equals(order.getStatus())) {
-            return order;
-        }
+        if ("paid".equals(order.getStatus())) throw new BusinessException("已支付订单不可取消");
+        if ("cancelled".equals(order.getStatus())) return order;
 
         order.setStatus("cancelled");
         orderRepository.save(order);
         releaseSeats(order.getId());
 
-        log.info("取消订单：orderId={}", orderId);
+        log.info("手动取消订单：orderId={}, orderNo={}", orderId, order.getOrderNo());
         return order;
     }
 
@@ -159,11 +146,11 @@ public class OrderService {
 
         for (Order order : pendingOrders) {
             if (order.getCreateTime() == null) continue;
-
             LocalDateTime created;
             try {
                 created = LocalDateTime.parse(order.getCreateTime(), DTF);
             } catch (Exception e) {
+                log.warn("订单时间格式异常，跳过：orderId={}", order.getId());
                 continue;
             }
 
@@ -172,17 +159,23 @@ public class OrderService {
                 orderRepository.save(order);
                 releaseSeats(order.getId());
                 cancelledCount++;
+                log.info("超时取消订单：orderId={}, orderNo={}", order.getId(), order.getOrderNo());
             }
         }
-
-        if (cancelledCount > 0) {
-            log.info("自动取消超时订单 {} 个", cancelledCount);
-        }
+        if (cancelledCount > 0) log.info("本轮共自动取消超时订单 {} 个", cancelledCount);
     }
 
     // ==================== 查询 ====================
     public List<Order> listAll() {
         return orderRepository.findAllByOrderByIdDesc();
+    }
+
+    /** 按状态查询（新增） */
+    public List<Order> listByStatus(String status) {
+        if (status == null || status.isEmpty() || "all".equals(status)) {
+            return orderRepository.findAllByOrderByIdDesc();
+        }
+        return orderRepository.findByStatusOrderByIdDesc(status);
     }
 
     public Order getById(Long id) {
@@ -201,9 +194,7 @@ public class OrderService {
 
     private int[] parseSeatLabel(String label) {
         Matcher m = SEAT_LABEL.matcher(label == null ? "" : label.trim());
-        if (!m.matches()) {
-            throw new BusinessException("座位格式错误：" + label);
-        }
+        if (!m.matches()) throw new BusinessException("座位格式错误：" + label);
         return new int[]{Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2))};
     }
 

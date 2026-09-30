@@ -4,6 +4,7 @@ import com.maoyan.common.Result;
 import com.maoyan.dto.CreateOrderRequest;
 import com.maoyan.entity.Order;
 import com.maoyan.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +18,10 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    /** 全部订单 */
+    /** 全部订单 / 按状态筛选（新增 status 参数） */
     @GetMapping
-    public Result<List<Order>> list() {
-        return Result.success(orderService.listAll());
+    public Result<List<Order>> list(@RequestParam(required = false) String status) {
+        return Result.success(orderService.listByStatus(status));
     }
 
     /** 订单详情 */
@@ -31,7 +32,7 @@ public class OrderController {
 
     /** 锁座 + 创建待支付订单 */
     @PostMapping
-    public Result<Order> create(@RequestBody CreateOrderRequest req) {
+    public Result<Order> create(@RequestBody @Valid CreateOrderRequest req) {
         return Result.success(orderService.createOrder(req.getScheduleId(), req.getSeats()));
     }
 

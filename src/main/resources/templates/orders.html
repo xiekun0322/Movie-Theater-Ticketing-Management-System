@@ -1,31 +1,35 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>我的订单 - 猫眼电影</title>
+    <title>我的订单 - 星幕影票</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 14px; }
         a { text-decoration: none; color: inherit; }
         ul, li { list-style: none; }
 
-        /* 顶部导航 */
         .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center;
             padding: 0 15%; position: sticky; top: 0; background: #fff; z-index: 100; }
         .logo { display: flex; align-items: center; margin-right: 40px; }
-        .logo-icon { width: 40px; height: 40px; background: #ef4238; border-radius: 50%; color: #fff;
+        .logo-icon { width: 40px; height: 40px; background: #1e3a8a; border-radius: 50%; color: #fff;
             display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
         .logo-text { font-size: 20px; font-weight: bold; }
         .main-menu { display: flex; height: 100%; }
         .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
-        .main-menu li.active a { color: #ef4238; }
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
 
-        /* 主体 */
         .wrap { width: 1000px; margin: 30px auto 60px; }
-        .page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #ef4238; }
+        .page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #1e3a8a; }
 
-        /* 订单卡片 */
+        /* ★ 状态筛选 tabs（新增） */
+        .status-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #fff;
+            border-radius: 6px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .status-tab { padding: 10px 24px; border-radius: 4px; font-size: 14px; color: #666;
+            cursor: pointer; transition: all 0.2s; }
+        .status-tab:hover { background: #f8f8f8; }
+        .status-tab.active { background: #1e3a8a; color: #fff; font-weight: bold; }
+
         .order-card { background: #fff; border-radius: 6px; margin-bottom: 16px; padding: 20px 25px;
             display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .order-left { flex: 1; min-width: 0; }
@@ -39,7 +43,7 @@
             padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; letter-spacing: 2px; }
 
         .order-right { text-align: right; margin-left: 20px; flex-shrink: 0; }
-        .order-price { font-size: 22px; color: #ef4238; font-weight: bold; margin-bottom: 10px; }
+        .order-price { font-size: 22px; color: #1e3a8a; font-weight: bold; margin-bottom: 10px; }
         .order-price::before { content: '¥'; font-size: 14px; }
 
         .status { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: 12px; }
@@ -47,26 +51,26 @@
         .status.paid      { background: #e8f5e9; color: #43a047; }
         .status.cancelled { background: #f5f5f5; color: #999; }
 
-        .view-btn { display: inline-block; margin-top: 12px; background: #ef4238; color: #fff;
+        .view-btn { display: inline-block; margin-top: 12px; background: #1e3a8a; color: #fff;
             padding: 8px 22px; border-radius: 4px; font-size: 14px; transition: background 0.3s; }
-        .view-btn:hover { background: #d6382f; }
-        .view-btn.ghost { background: #fff; color: #ef4238; border: 1px solid #ef4238; }
+        .view-btn:hover { background: #152c6b; }
+        .view-btn.ghost { background: #fff; color: #1e3a8a; border: 1px solid #1e3a8a; }
         .view-btn.ghost:hover { background: #fff5f4; }
 
         .empty { text-align: center; padding: 100px 0; color: #999; background: #fff; border-radius: 6px; }
-        .empty a { color: #ef4238; }
+        .empty a { color: #1e3a8a; }
 
         .footer { background: #262426; color: #999; padding: 40px 0; font-size: 12px;
             line-height: 2; text-align: center; }
-        .footer a { color: #ef4238; }
+        .footer a { color: #1e3a8a; }
     </style>
 </head>
 <body>
 
 <header class="top-nav">
     <div class="logo">
-        <div class="logo-icon">猫</div>
-        <div class="logo-text">猫眼电影</div>
+        <div class="logo-icon">星</div>
+        <div class="logo-text">星幕影票</div>
     </div>
     <ul class="main-menu">
         <li><a th:href="@{/}">首页</a></li>
@@ -76,13 +80,29 @@
     </ul>
     <div class="nav-right">
         <div>📱 APP下载 ▼</div>
-        <a th:href="@{/orders}"><div style="color:#ef4238;">🎟️ 我的订单</div></a>
+        <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
         <div>👤 ▼</div>
     </div>
 </header>
 
 <div class="wrap">
     <div class="page-title">我的订单</div>
+
+    <!-- ★ 状态筛选 tabs -->
+    <div class="status-tabs">
+        <a th:href="@{/orders(status='all')}"
+           class="status-tab"
+           th:classappend="${currentStatus == 'all'} ? 'active' : ''">全部</a>
+        <a th:href="@{/orders(status='pending')}"
+           class="status-tab"
+           th:classappend="${currentStatus == 'pending'} ? 'active' : ''">待支付</a>
+        <a th:href="@{/orders(status='paid')}"
+           class="status-tab"
+           th:classappend="${currentStatus == 'paid'} ? 'active' : ''">已支付</a>
+        <a th:href="@{/orders(status='cancelled')}"
+           class="status-tab"
+           th:classappend="${currentStatus == 'cancelled'} ? 'active' : ''">已取消</a>
+    </div>
 
     <!-- 空状态 -->
     <div class="empty" th:if="${orders == null or orders.isEmpty()}">
@@ -114,26 +134,17 @@
                   th:text="${o.status == 'pending' ? '待支付' : (o.status == 'paid' ? '已支付' : '已取消')}">状态</span>
 
             <div>
-                <!-- 待支付：去支付；已支付：查看票券；已取消：查看详情 -->
-                <a th:if="${o.status == 'pending'}"
-                   class="view-btn"
-                   th:href="@{/order/{id}(id=${o.id})}">去支付</a>
-
-                <a th:if="${o.status == 'paid'}"
-                   class="view-btn"
-                   th:href="@{/order/{id}(id=${o.id})}">查看票券</a>
-
-                <a th:if="${o.status == 'cancelled'}"
-                   class="view-btn ghost"
-                   th:href="@{/order/{id}(id=${o.id})}">查看详情</a>
+                <a th:if="${o.status == 'pending'}" class="view-btn" th:href="@{/order/{id}(id=${o.id})}">去支付</a>
+                <a th:if="${o.status == 'paid'}" class="view-btn" th:href="@{/order/{id}(id=${o.id})}">查看票券</a>
+                <a th:if="${o.status == 'cancelled'}" class="view-btn ghost" th:href="@{/order/{id}(id=${o.id})}">查看详情</a>
             </div>
         </div>
     </div>
 </div>
 
 <footer class="footer">
-    <div>关于猫眼：<a href="#">关于我们</a> | <a href="#">董事会成员</a></div>
-    <div>©2026 猫眼电影 www.maoyan.com</div>
+    <div>关于星幕：<a href="#">关于我们</a> | <a href="#">董事会成员</a></div>
+    <div>©2026 星幕影票 www.starscreen.com</div>
 </footer>
 
 </body>
