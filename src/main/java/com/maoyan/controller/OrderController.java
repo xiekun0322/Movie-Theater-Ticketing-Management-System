@@ -1,59 +1,49 @@
 package com.maoyan.controller;
 
+import com.maoyan.common.Result;
 import com.maoyan.dto.CreateOrderRequest;
 import com.maoyan.entity.Order;
-import com.maoyan.repository.OrderRepository;
 import com.maoyan.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin
 public class OrderController {
 
-    @Autowired private OrderService orderService;
-    @Autowired private OrderRepository orderRepository;
+    @Autowired
+    private OrderService orderService;
 
+    /** 全部订单 */
     @GetMapping
-    public List<Order> list() {
-        return orderRepository.findAllByOrderByIdDesc();
+    public Result<List<Order>> list() {
+        return Result.success(orderService.listAll());
     }
 
+    /** 订单详情 */
     @GetMapping("/{id}")
-    public Order detail(@PathVariable Long id) {
-        return orderRepository.findById(id).orElse(null);
+    public Result<Order> detail(@PathVariable Long id) {
+        return Result.success(orderService.getById(id));
     }
 
+    /** 锁座 + 创建待支付订单 */
     @PostMapping
-    public ResponseEntity<?> create(@RequestBody CreateOrderRequest req) {
-        try {
-            Order order = orderService.createOrder(req.getScheduleId(), req.getSeats());
-            return ResponseEntity.ok(order);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+    public Result<Order> create(@RequestBody CreateOrderRequest req) {
+        return Result.success(orderService.createOrder(req.getScheduleId(), req.getSeats()));
     }
 
+    /** 模拟支付 */
     @PostMapping("/{id}/pay")
-    public ResponseEntity<?> pay(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(orderService.pay(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+    public Result<Order> pay(@PathVariable Long id) {
+        return Result.success(orderService.pay(id));
     }
 
+    /** 取消订单 */
     @PostMapping("/{id}/cancel")
-    public ResponseEntity<?> cancel(@PathVariable Long id) {
-        try {
-            return ResponseEntity.ok(orderService.cancel(id));
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-        }
+    public Result<Order> cancel(@PathVariable Long id) {
+        return Result.success(orderService.cancel(id));
     }
 }

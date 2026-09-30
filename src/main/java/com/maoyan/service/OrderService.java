@@ -1,5 +1,6 @@
 package com.maoyan.service;
 
+import com.maoyan.common.BusinessException;
 import com.maoyan.entity.Movie;
 import com.maoyan.entity.Order;
 import com.maoyan.entity.Schedule;
@@ -8,6 +9,8 @@ import com.maoyan.repository.MovieRepository;
 import com.maoyan.repository.OrderRepository;
 import com.maoyan.repository.ScheduleRepository;
 import com.maoyan.repository.SeatRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,8 @@ import java.util.regex.Pattern;
 @Service
 public class OrderService {
 
+    private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
     private static final int PAY_TIMEOUT_MINUTES = 10;
 
     private static final DateTimeFormatter DTF =
@@ -36,29 +41,30 @@ public class OrderService {
     @Autowired private ScheduleRepository scheduleRepository;
     @Autowired private MovieRepository movieRepository;
 
+    // ==================== 1. 锁座下单 ====================
     @Transactional
     public Order createOrder(Long scheduleId, List<String> seatLabels) {
         if (scheduleId == null) {
-            throw new RuntimeException("场次 ID 不能为空");
+            throw new BusinessException("场次 ID 不能为空");
         }
         if (seatLabels == null || seatLabels.isEmpty()) {
-            throw new RuntimeException("请至少选择一个座位");
+            throw new BusinessException("请至少选择一个座位");
         }
         if (seatLabels.size() > MAX_SEATS_PER_ORDER) {
-            throw new RuntimeException("一次最多选择 " + MAX_SEATS_PER_ORDER + " 个座位");
+            throw new BusinessException("一次最多选择 " + MAX_SEATS_PER_ORDER + " 个座位");
         }
 
         Schedule schedule = scheduleRepository.findById(scheduleId)
-                .orElseThrow(() -> new RuntimeException("场次不存在"));
+                .orElseThrow(() -> new BusinessException("场次不存在"));
 
         List<Seat> seats = new ArrayList<>();
         for (String label : seatLabels) {
             int[] rc = parseSeatLabel(label);
             Seat seat = seatRepository
                     .findByScheduleIdAndRowNumAndColNum(scheduleId, rc[0], rc[1])
-                    .orElseThrow(() -> new RuntimeException("座位不存在：" + label));
+                    .orElseThrow(() -> new BusinessException("座位不存在：" + label));
             if (!"available".equals(seat.getStatus())) {
-                throw new RuntimeException("座位已被选走：" + label);
+                throw new BusinessException("座位已被选走：" + label);
             }
             seats.add(seat);
         }
@@ -85,19 +91,23 @@ public class OrderService {
         }
         seatRepository.saveAll(seats);
 
+        log.info("创建订单：orderNo={}, scheduleId={}, seats={}",
+                order.getOrderNo(), scheduleId, seatLabels);
+
         return order;
     }
 
+    // ==================== 2. 支付 ====================
     @Transactional
     public Order pay(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("订单不存在"));
+                .orElseThrow(() -> new BusinessException("订单不存在"));
 
         if ("paid".equals(order.getStatus())) {
-            throw new RuntimeException("订单已支付，请勿重复操作");
+            throw new BusinessException("订单已支付，请勿重复操作");
         }
         if (!"pending".equals(order.getStatus())) {
-            throw new RuntimeException("订单状态不允许支付：" + order.getStatus());
+            throw new BusinessException("订单状态不允许支付：" + order.getStatus());
         }
 
         order.setStatus("paid");
@@ -111,16 +121,19 @@ public class OrderService {
         }
         seatRepository.saveAll(seats);
 
+        log.info("支付订单：orderId={}, ticketCode={}", orderId, order.getTicketCode());
+
         return order;
     }
 
+    // ==================== 3. 取消订单 ====================
     @Transactional
     public Order cancel(Long orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("订单不存在"));
+                .orElseThrow(() -> new BusinessException("订单不存在"));
 
         if ("paid".equals(order.getStatus())) {
-            throw new RuntimeException("已支付订单不可取消");
+            throw new BusinessException("已支付订单不可取消");
         }
         if ("cancelled".equals(order.getStatus())) {
             return order;
@@ -129,9 +142,12 @@ public class OrderService {
         order.setStatus("cancelled");
         orderRepository.save(order);
         releaseSeats(order.getId());
+
+        log.info("取消订单：orderId={}", orderId);
         return order;
     }
 
+    // ==================== 4. 定时取消超时订单 ====================
     @Scheduled(fixedRate = 30_000)
     @Transactional
     public void cancelExpiredOrders() {
@@ -160,10 +176,20 @@ public class OrderService {
         }
 
         if (cancelledCount > 0) {
-            System.out.println("====== 自动取消超时订单 " + cancelledCount + " 个 ======");
+            log.info("自动取消超时订单 {} 个", cancelledCount);
         }
     }
 
+    // ==================== 查询 ====================
+    public List<Order> listAll() {
+        return orderRepository.findAllByOrderByIdDesc();
+    }
+
+    public Order getById(Long id) {
+        return orderRepository.findById(id).orElse(null);
+    }
+
+    // ==================== 私有方法 ====================
     private void releaseSeats(Long orderId) {
         List<Seat> seats = seatRepository.findByOrderId(orderId);
         for (Seat seat : seats) {
@@ -176,7 +202,7 @@ public class OrderService {
     private int[] parseSeatLabel(String label) {
         Matcher m = SEAT_LABEL.matcher(label == null ? "" : label.trim());
         if (!m.matches()) {
-            throw new RuntimeException("座位格式错误：" + label);
+            throw new BusinessException("座位格式错误：" + label);
         }
         return new int[]{Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2))};
     }

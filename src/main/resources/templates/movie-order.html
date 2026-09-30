@@ -20,7 +20,6 @@
 
         .container { width: 900px; margin: 40px auto 60px; }
 
-        /* 倒计时提示区 */
         .tip-box { background: #fef0f0; padding: 20px 30px; border-radius: 4px; display: flex; align-items: center; margin-bottom: 30px; }
         .tip-icon { font-size: 32px; margin-right: 20px; color: #ef4238; }
         .tip-title { font-size: 18px; color: #ef4238; font-weight: bold; margin-bottom: 6px; }
@@ -212,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
         timer = setInterval(updateCountdown, 1000);
     }
 
-    // ==================== 支付按钮（无 confirm 弹窗） ====================
+    // ==================== 支付按钮（适配统一响应格式） ====================
     if (!payBtn) return;
 
     payBtn.addEventListener('click', function () {
@@ -220,12 +219,9 @@ document.addEventListener('DOMContentLoaded', function () {
         payBtn.textContent = '支付中...';
 
         fetch('/api/orders/' + orderId + '/pay', { method: 'POST' })
-            .then(res => res.json().then(data => {
-                if (!res.ok) throw new Error(data.message || '支付失败');
-                return data;
-            }))
-            .then(order => {
-                // 静默刷新，页面自动显示取票码
+            .then(res => res.json())
+            .then(result => {
+                if (result.code !== 200) throw new Error(result.message);
                 window.location.reload();
             })
             .catch(err => {

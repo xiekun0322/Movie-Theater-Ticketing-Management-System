@@ -187,10 +187,14 @@
 
             let selectedSeats = [];
 
+            // ---------- 加载座位（适配统一响应格式） ----------
             function loadSeats() {
                 fetch('/api/seats/schedule/' + scheduleId)
                     .then(res => res.json())
-                    .then(seats => renderSeats(seats))
+                    .then(result => {
+                        if (result.code !== 200) throw new Error(result.message);
+                        renderSeats(result.data);
+                    })
                     .catch(() => alert('座位数据加载失败，请刷新重试'));
             }
 
@@ -280,6 +284,7 @@
                 }
             }
 
+            // ---------- 提交锁座（适配统一响应格式） ----------
             confirmBtn.addEventListener('click', function () {
                 if (selectedSeats.length === 0) return;
 
@@ -295,12 +300,10 @@
                         seats: selectedSeats.map(s => s.label)
                     })
                 })
-                .then(res => res.json().then(data => {
-                    if (!res.ok) throw new Error(data.message || '下单失败');
-                    return data;
-                }))
-                .then(order => {
-                    window.location.href = '/order/' + order.id;
+                .then(res => res.json())
+                .then(result => {
+                    if (result.code !== 200) throw new Error(result.message);
+                    window.location.href = '/order/' + result.data.id;
                 })
                 .catch(err => {
                     alert(err.message);
