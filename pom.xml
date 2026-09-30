@@ -11,11 +11,11 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.maoyan</groupId>
-    <artifactId>movie-ticketing</artifactId>
+    <groupId>com.starscreen</groupId>
+    <artifactId>starscreen-ticketing</artifactId>
     <version>1.0.0</version>
-    <name>movie-ticketing</name>
-    <description>Movie Theater Ticketing Management System</description>
+    <name>starscreen-ticketing</name>
+    <description>StarScreen Movie Ticketing System</description>
 
     <properties>
         <java.version>21</java.version>
@@ -27,12 +27,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-		
-		<!-- Spring validation -->
-		<dependency>
-    		<groupId>org.springframework.boot</groupId>
-	   		<artifactId>spring-boot-starter-validation</artifactId>
-		</dependency>
 
         <!-- Spring Data JPA -->
         <dependency>
@@ -40,10 +34,16 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-        <!-- ★ Thymeleaf 模板引擎（新增，关键！） -->
+        <!-- Thymeleaf 模板引擎 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
+        </dependency>
+
+        <!-- 参数校验 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
         <!-- MySQL 驱动 -->
@@ -58,6 +58,13 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Boot Test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
