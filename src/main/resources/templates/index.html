@@ -21,6 +21,22 @@
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
+        /* ★ 搜索框 */
+        .search-box { margin-left: 20px; display: flex; }
+        .search-box input {
+            width: 200px; height: 36px; border: 1px solid #ddd;
+            border-radius: 18px 0 0 18px; padding: 0 15px;
+            font-size: 14px; outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-box input:focus { border-color: #1e3a8a; }
+        .search-box button {
+            height: 36px; padding: 0 20px; border: none;
+            background: #1e3a8a; color: #fff; border-radius: 0 18px 18px 0;
+            font-size: 14px; cursor: pointer; transition: background 0.3s;
+        }
+        .search-box button:hover { background: #152c6b; }
+
         .container { width: 1200px; margin: 0 auto; padding-top: 40px; display: flex; justify-content: space-between; }
         .main-content { width: 840px; }
         .sidebar { width: 330px; }
@@ -72,6 +88,12 @@
 
         .floating-ad { position: fixed; bottom: 20px; left: 20px; width: 160px; height: 200px; background: #1e3a8a; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 12px; z-index: 1000; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .qr-placeholder { width: 100px; height: 100px; background: #fff; margin-top: 10px; border-radius: 5px; }
+
+        /* 空搜索结果 */
+        .empty-search { text-align: center; padding: 80px 0; color: #999; }
+        .empty-search .icon { font-size: 48px; margin-bottom: 20px; opacity: 0.3; }
+        .empty-search .text { font-size: 16px; margin-bottom: 10px; }
+        .empty-search .keyword { color: #1e3a8a; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -87,6 +109,12 @@
             <li><a href="#">影院</a></li>
             <li><a href="#">演出</a></li>
         </ul>
+        <!-- ★ 搜索框 -->
+        <form class="search-box" th:action="@{/}" method="get">
+            <input type="text" name="keyword" placeholder="搜索电影"
+                   th:value="${keyword != null ? keyword : ''}">
+            <button type="submit">搜索</button>
+        </form>
         <div class="nav-right">
             <div>📱 APP下载 ▼</div>
             <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
@@ -97,13 +125,17 @@
     <div class="container">
         <main class="main-content">
 
-            <section>
+            <!-- 搜索结果模式 -->
+            <div th:if="${isSearching}">
                 <div class="section-title">
-                    <h2>正在热映 (<span th:text="${showingMovies.size()}">0</span>部)</h2>
-                    <span class="more-link">全部 ></span>
+                    <h2>搜索 "<span th:text="${keyword}">关键词</span>" 的结果
+                        (<span th:text="${searchResults.size()}">0</span>部)</h2>
+                    <a th:href="@{/}" class="more-link">返回首页 ></a>
                 </div>
-                <div class="movie-grid">
-                    <div class="movie-card" th:each="movie : ${showingMovies}">
+
+                <!-- 有结果 -->
+                <div class="movie-grid" th:if="${!searchResults.isEmpty()}">
+                    <div class="movie-card" th:each="movie : ${searchResults}">
                         <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
                             <div class="poster-wrapper">
                                 <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
@@ -118,33 +150,66 @@
                         </div>
                     </div>
                 </div>
-            </section>
 
-            <section style="margin-top: 50px;">
-                <div class="section-title">
-                    <h2>即将上映 (<span th:text="${upcomingMovies.size()}">0</span>部)</h2>
-                    <span class="more-link">全部 ></span>
+                <!-- 无结果 -->
+                <div class="empty-search" th:if="${searchResults.isEmpty()}">
+                    <div class="icon">🔍</div>
+                    <div class="text">没有找到与 <span class="keyword" th:text="${keyword}">xx</span> 相关的电影</div>
+                    <div><a th:href="@{/}" style="color:#1e3a8a;">返回首页看全部电影</a></div>
                 </div>
-                <div class="movie-grid">
-                    <div class="movie-card" th:each="movie : ${upcomingMovies}">
-                        <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
-                            <div class="poster-wrapper">
-                                <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
-                                <div class="poster-img"
-                                     th:style="'background-image: url(' + ${movie.poster} + '); background-size: cover; background-position: center;'"></div>
-                                <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
-                            </div>
-                        </a>
-                        <div class="card-subtext" th:if="${movie.wantCount != null}"
-                             th:text="${movie.wantCount} + '人想看'">1234人想看</div>
-                        <div class="card-actions">
-                            <div class="action-btn">预告片</div>
-                            <a th:href="@{/cinemas/{id}(id=${movie.id})}" class="action-btn">预售</a>
-                        </div>
-                        <div class="card-subtext" th:text="${movie.releaseDate} + '上映'">9月23日上映</div>
+            </div>
+
+            <!-- 默认模式：正在热映 + 即将上映 -->
+            <div th:if="${!isSearching}">
+                <section>
+                    <div class="section-title">
+                        <h2>正在热映 (<span th:text="${showingMovies.size()}">0</span>部)</h2>
+                        <span class="more-link">全部 ></span>
                     </div>
-                </div>
-            </section>
+                    <div class="movie-grid">
+                        <div class="movie-card" th:each="movie : ${showingMovies}">
+                            <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
+                                <div class="poster-wrapper">
+                                    <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
+                                    <div class="poster-img"
+                                         th:style="'background-image: url(' + ${movie.poster} + '); background-size: cover; background-position: center;'"></div>
+                                    <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
+                                    <div class="poster-score" th:if="${movie.score != null}" th:text="${movie.score}">9.5</div>
+                                </div>
+                            </a>
+                            <div class="card-actions">
+                                <a th:href="@{/cinemas/{id}(id=${movie.id})}" class="action-btn">购票</a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section style="margin-top: 50px;">
+                    <div class="section-title">
+                        <h2>即将上映 (<span th:text="${upcomingMovies.size()}">0</span>部)</h2>
+                        <span class="more-link">全部 ></span>
+                    </div>
+                    <div class="movie-grid">
+                        <div class="movie-card" th:each="movie : ${upcomingMovies}">
+                            <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
+                                <div class="poster-wrapper">
+                                    <div class="poster-tag" th:if="${movie.tag != null}" th:text="${movie.tag}">2DIMAX</div>
+                                    <div class="poster-img"
+                                         th:style="'background-image: url(' + ${movie.poster} + '); background-size: cover; background-position: center;'"></div>
+                                    <div class="poster-bottom-info" th:text="${movie.title}">电影名</div>
+                                </div>
+                            </a>
+                            <div class="card-subtext" th:if="${movie.wantCount != null}"
+                                 th:text="${movie.wantCount} + '人想看'">1234人想看</div>
+                            <div class="card-actions">
+                                <div class="action-btn">预告片</div>
+                                <a th:href="@{/cinemas/{id}(id=${movie.id})}" class="action-btn">预售</a>
+                            </div>
+                            <div class="card-subtext" th:text="${movie.releaseDate} + '上映'">9月23日上映</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
         </main>
 
         <aside class="sidebar">
