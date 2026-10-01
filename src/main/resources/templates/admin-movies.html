@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>电影管理 - 星幕影票</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 14px; }
+        a { text-decoration: none; color: inherit; }
+        ul, li { list-style: none; }
+
+        .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; padding: 0 15%; position: sticky; top: 0; background: #fff; z-index: 100; }
+        .logo { display: flex; align-items: center; margin-right: 40px; }
+        .logo-icon { width: 40px; height: 40px; background: #1e3a8a; border-radius: 50%; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
+        .logo-text { font-size: 20px; font-weight: bold; }
+        .main-menu { display: flex; height: 100%; }
+        .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
+        .main-menu li.active a { color: #1e3a8a; font-weight: bold; }
+        .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
+
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-name { color: #333; font-size: 14px; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); min-width: 120px; padding: 8px 0; z-index: 1000; }
+        .user-dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
+
+        .wrap { width: 1200px; margin: 30px auto 60px; }
+
+        /* 顶部工具栏 */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .page-title { font-size: 24px; font-weight: bold; color: #1e3a8a; }
+        .add-btn { background: #1e3a8a; color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; transition: background 0.3s; }
+        .add-btn:hover { background: #152c6b; }
+
+        /* 表格 */
+        .table-card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 10px; color: #999; font-weight: normal; font-size: 13px; border-bottom: 2px solid #f0f0f0; }
+        td { padding: 14px 10px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
+        tr:last-child td { border-bottom: none; }
+
+        .movie-thumb {
+            width: 50px; height: 70px; border-radius: 4px;
+            background-size: cover; background-position: center; background-color: #f0f0f0;
+        }
+
+        .status-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; }
+        .status-tag.showing { background: #e8f5e9; color: #43a047; }
+        .status-tag.upcoming { background: #fff3e0; color: #ff9800; }
+
+        .op-btn { display: inline-block; padding: 5px 12px; border-radius: 3px; font-size: 13px; cursor: pointer; border: none; margin-right: 6px; transition: all 0.2s; }
+        .op-btn.edit { background: #eef2ff; color: #1e3a8a; }
+        .op-btn.edit:hover { background: #dbe4ff; }
+        .op-btn.delete { background: #fef0f0; color: #dc2626; }
+        .op-btn.delete:hover { background: #fee2e2; }
+
+        /* 分页 */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
+        .pagination button { padding: 8px 16px; border-radius: 4px; border: 1px solid #e5e5e5; background: #fff; cursor: pointer; font-size: 14px; }
+        .pagination button:disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
+        .pagination .info { color: #999; font-size: 13px; }
+
+        /* 弹窗 */
+        .modal-mask {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+        .modal-mask.show { display: flex; }
+        .modal {
+            background: #fff; border-radius: 8px;
+            width: 560px; max-height: 90vh; overflow-y: auto;
+            padding: 30px;
+        }
+        .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #1e3a8a; }
+        .form-row { margin-bottom: 15px; }
+        .form-row label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
+        .form-row input, .form-row select, .form-row textarea {
+            width: 100%; height: 38px; border: 1px solid #ddd;
+            border-radius: 4px; padding: 0 12px; font-size: 14px;
+            outline: none; transition: border-color 0.3s;
+        }
+        .form-row textarea { height: 60px; padding: 10px 12px; resize: none; }
+        .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: #1e3a8a; }
+
+        .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+        .btn-cancel { padding: 10px 24px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; font-size: 14px; color: #666; }
+        .btn-submit { padding: 10px 24px; background: #1e3a8a; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+        .btn-submit:hover { background: #152c6b; }
+
+        .footer { background: #262426; color: #999; padding: 40px 0; font-size: 12px; line-height: 2; text-align: center; }
+        .footer a { color: #1e3a8a; }
+    </style>
+</head>
+<body>
+
+<header class="top-nav">
+    <div class="logo">
+        <div class="logo-icon">星</div>
+        <div class="logo-text">星幕影票 · 后台</div>
+    </div>
+    <ul class="main-menu">
+        <li><a th:href="@{/admin}">数据概览</a></li>
+        <li class="active"><a th:href="@{/admin/movies}">电影管理</a></li>
+        <li><a th:href="@{/orders}">订单</a></li>
+    </ul>
+    <div class="nav-right">
+        <div th:if="${session.username != null}" class="user-menu">
+            <div class="user-dropdown">
+                <span class="user-name">👤 <span th:text="${session.username}">用户名</span> ▼</span>
+                <div class="dropdown-menu">
+                    <a th:href="@{/orders}">我的订单</a>
+                    <a th:href="@{/admin}">后台管理</a>
+                    <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="wrap">
+    <div class="toolbar">
+        <div class="page-title">电影管理</div>
+        <button class="add-btn" id="addBtn">+ 新增电影</button>
+    </div>
+
+    <div class="table-card">
+        <table>
+            <thead>
+            <tr>
+                <th style="width:80px;">海报</th>
+                <th>电影名</th>
+                <th style="width:80px;">评分</th>
+                <th style="width:100px;">状态</th>
+                <th style="width:120px;">上映日期</th>
+                <th style="width:120px;">时长</th>
+                <th style="width:180px;">操作</th>
+            </tr>
+            </thead>
+            <tbody id="movieTableBody">
+            </tbody>
+        </table>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+</div>
+
+<!-- 新增/编辑弹窗 -->
+<div class="modal-mask" id="modalMask">
+    <div class="modal">
+        <div class="modal-title" id="modalTitle">新增电影</div>
+
+        <input type="hidden" id="movieId">
+
+        <div class="form-row">
+            <label>电影名 *</label>
+            <input type="text" id="title" placeholder="例如：八仙！">
+        </div>
+        <div class="form-row">
+            <label>海报路径</label>
+            <input type="text" id="poster" placeholder="/images/poster1.jpg">
+        </div>
+        <div class="form-row">
+            <label>导演</label>
+            <input type="text" id="director" placeholder="例如：张艺谋">
+        </div>
+        <div class="form-row">
+            <label>主演（逗号分隔）</label>
+            <input type="text" id="actors" placeholder="何仙姑,吕洞宾,铁拐李">
+        </div>
+        <div class="form-row">
+            <label>时长（分钟）</label>
+            <input type="number" id="duration" placeholder="120">
+        </div>
+        <div class="form-row">
+            <label>评分</label>
+            <input type="number" step="0.1" id="score" placeholder="9.5">
+        </div>
+        <div class="form-row">
+            <label>标签</label>
+            <input type="text" id="tag" placeholder="2DIMAX">
+        </div>
+        <div class="form-row">
+            <label>上映日期</label>
+            <input type="date" id="releaseDate">
+        </div>
+        <div class="form-row">
+            <label>状态</label>
+            <select id="status">
+                <option value="showing">正在热映</option>
+                <option value="upcoming">即将上映</option>
+            </select>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn-cancel" id="cancelBtn">取消</button>
+            <button class="btn-submit" id="submitBtn">保存</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div>©2026 星幕影票 www.starscreen.com</div>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let currentPage = 0;
+    const pageSize = 10;
+    let totalPages = 1;
+
+    const tbody = document.getElementById('movieTableBody');
+    const pagination = document.getElementById('pagination');
+    const modalMask = document.getElementById('modalMask');
+    const modalTitle = document.getElementById('modalTitle');
+
+    // 加载列表
+    function loadMovies(page) {
+        fetch('/api/admin/movies?page=' + page + '&size=' + pageSize)
+            .then(res => res.json())
+            .then(result => {
+                if (result.code !== 200) throw new Error(result.message);
+                renderTable(result.data.content);
+                currentPage = result.data.number;
+                totalPages = result.data.totalPages;
+                renderPagination(result.data);
+            })
+            .catch(err => alert('加载失败：' + err.message));
+    }
+
+    function renderTable(movies) {
+        if (!movies || movies.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:60px;">暂无电影数据</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = movies.map(m => `
+            <tr>
+                <td>
+                    <div class="movie-thumb" style="background-image: url('${m.poster || ''}')"></div>
+                </td>
+                <td><strong>${m.title || '-'}</strong></td>
+                <td>${m.score != null ? m.score : '-'}</td>
+                <td>
+                    <span class="status-tag ${m.status}">
+                        ${m.status === 'showing' ? '正在热映' : '即将上映'}
+                    </span>
+                </td>
+                <td>${m.releaseDate || '-'}</td>
+                <td>${m.duration != null ? m.duration + ' 分钟' : '-'}</td>
+                <td>
+                    <button class="op-btn edit" onclick="editMovie(${m.id})">编辑</button>
+                    <button class="op-btn delete" onclick="deleteMovie(${m.id}, '${m.title}')">删除</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function renderPagination(pageData) {
+        const total = pageData.totalPages;
+        const current = pageData.number;
+        pagination.innerHTML = `
+            <button ${current === 0 ? 'disabled' : ''} onclick="gotoPage(${current - 1})">上一页</button>
+            <span class="info">第 ${current + 1} / ${total} 页（共 ${pageData.totalElements} 条）</span>
+            <button ${current >= total - 1 ? 'disabled' : ''} onclick="gotoPage(${current + 1})">下一页</button>
+        `;
+    }
+
+    // 全局函数（onclick 用）
+    window.gotoPage = function (page) {
+        if (page < 0 || page >= totalPages) return;
+        loadMovies(page);
+    };
+
+    window.deleteMovie = function (id, title) {
+        if (!confirm(`确定要删除电影《${title}》吗？`)) return;
+
+        fetch('/api/admin/movies/' + id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(result => {
+                if (result.code !== 200) throw new Error(result.message);
+                alert('删除成功');
+                loadMovies(currentPage);
+            })
+            .catch(err => alert('删除失败：' + err.message));
+    };
+
+    window.editMovie = function (id) {
+        fetch('/api/admin/movies/' + id)
+            .then(res => res.json())
+            .then(result => {
+                if (result.code !== 200) throw new Error(result.message);
+                const m = result.data;
+                modalTitle.textContent = '编辑电影';
+                document.getElementById('movieId').value = m.id;
+                document.getElementById('title').value = m.title || '';
+                document.getElementById('poster').value = m.poster || '';
+                document.getElementById('director').value = m.director || '';
+                document.getElementById('actors').value = m.actors || '';
+                document.getElementById('duration').value = m.duration || '';
+                document.getElementById('score').value = m.score || '';
+                document.getElementById('tag').value = m.tag || '';
+                document.getElementById('releaseDate').value = m.releaseDate || '';
+                document.getElementById('status').value = m.status || 'showing';
+                modalMask.classList.add('show');
+            })
+            .catch(err => alert('加载失败：' + err.message));
+    };
+
+    // 新增
+    document.getElementById('addBtn').addEventListener('click', function () {
+        modalTitle.textContent = '新增电影';
+        document.getElementById('movieId').value = '';
+        document.getElementById('title').value = '';
+        document.getElementById('poster').value = '/images/poster1.jpg';
+        document.getElementById('director').value = '';
+        document.getElementById('actors').value = '';
+        document.getElementById('duration').value = '';
+        document.getElementById('score').value = '';
+        document.getElementById('tag').value = '';
+        document.getElementById('releaseDate').value = '';
+        document.getElementById('status').value = 'showing';
+        modalMask.classList.add('show');
+    });
+
+    // 取消
+    document.getElementById('cancelBtn').addEventListener('click', function () {
+        modalMask.classList.remove('show');
+    });
+
+    // 提交
+    document.getElementById('submitBtn').addEventListener('click', function () {
+        const id = document.getElementById('movieId').value;
+        const payload = {
+            title: document.getElementById('title').value.trim(),
+            poster: document.getElementById('poster').value.trim(),
+            director: document.getElementById('director').value.trim(),
+            actors: document.getElementById('actors').value.trim(),
+            duration: parseInt(document.getElementById('duration').value) || null,
+            score: parseFloat(document.getElementById('score').value) || null,
+            tag: document.getElementById('tag').value.trim() || null,
+            releaseDate: document.getElementById('releaseDate').value || null,
+            status: document.getElementById('status').value
+        };
+
+        if (!payload.title) {
+            alert('电影名不能为空');
+            return;
+        }
+
+        const url = id ? '/api/admin/movies/' + id : '/api/admin/movies';
+        const method = id ? 'PUT' : 'POST';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        })
+        .then(res => res.json())
+        .then(result => {
+            if (result.code !== 200) throw new Error(result.message);
+            alert(id ? '更新成功' : '新增成功');
+            modalMask.classList.remove('show');
+            loadMovies(currentPage);
+        })
+        .catch(err => alert('保存失败：' + err.message));
+    });
+
+    // 登出
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            if (!confirm('确定要退出登录吗？')) return;
+            fetch('/api/user/logout', { method: 'POST' })
+                .then(() => { window.location.href = '/'; })
+                .catch(() => { window.location.href = '/'; });
+        });
+    }
+
+    // 启动
+    loadMovies(0);
+});
+</script>
+
+</body>
+</html>

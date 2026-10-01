@@ -75,25 +75,18 @@ public class PageController {
         return "seat";
     }
 
-    /** 订单详情（校验用户） */
     @GetMapping("/order/{id}")
     public String orderDetail(@PathVariable Long id, Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         Order order = orderRepository.findById(id).orElse(null);
-
-        if (order == null) {
-            return "redirect:/orders";
-        }
-        // 未登录 / 不是自己的订单 → 跳回订单列表
+        if (order == null) return "redirect:/orders";
         if (userId == null || !userId.equals(order.getUserId())) {
             return "redirect:/orders";
         }
-
         model.addAttribute("order", order);
         return "movie-order";
     }
 
-    /** 我的订单列表（只显示当前用户） */
     @GetMapping("/orders")
     public String orders(@RequestParam(required = false, defaultValue = "all") String status,
                          @RequestParam(defaultValue = "0") int page,
@@ -115,6 +108,12 @@ public class PageController {
     public String admin(Model model) {
         model.addAttribute("stats", adminService.getStats());
         return "admin";
+    }
+
+    /** 电影管理页 */
+    @GetMapping("/admin/movies")
+    public String adminMovies() {
+        return "admin-movies";
     }
 
     @GetMapping("/login")
