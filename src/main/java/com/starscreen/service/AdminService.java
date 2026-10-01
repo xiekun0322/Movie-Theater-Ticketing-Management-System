@@ -1,10 +1,9 @@
 package com.starscreen.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.starscreen.dto.AdminStats;
 import com.starscreen.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 @Service
 public class AdminService {
@@ -21,6 +20,7 @@ public class AdminService {
         stats.setCancelledOrders(orderRepository.countByStatus("cancelled"));
         stats.setTotalRevenue(orderRepository.sumPaidTotalPrice());
         stats.setTopMovies(orderRepository.topMoviesByRevenue());
+        stats.setDailyRevenue(orderRepository.dailyRevenue());   // 新增
 
         return stats;
     }

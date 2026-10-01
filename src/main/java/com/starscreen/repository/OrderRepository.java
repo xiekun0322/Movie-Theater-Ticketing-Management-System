@@ -10,19 +10,18 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    // ========== 无用户过滤（旧方法，AdminController 等可能用） ==========
+    // 基础查询
     List<Order> findByStatus(String status);
     List<Order> findAllByOrderByIdDesc();
     List<Order> findByStatusOrderByIdDesc(String status);
     Page<Order> findAllByOrderByIdDesc(Pageable pageable);
     Page<Order> findByStatusOrderByIdDesc(String status, Pageable pageable);
 
-    // ========== 按 userId 过滤（新增） ==========
+    // 用户隔离
     Page<Order> findByUserIdOrderByIdDesc(Long userId, Pageable pageable);
     Page<Order> findByUserIdAndStatusOrderByIdDesc(Long userId, String status, Pageable pageable);
-    List<Order> findByStatusAndId(String status, Long id);
 
-    // ========== 统计 ==========
+    // 统计
     long countByStatus(String status);
 
     @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o WHERE o.status = 'paid'")
@@ -33,4 +32,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
            "GROUP BY o.movieTitle " +
            "ORDER BY SUM(o.totalPrice) DESC")
     List<Object[]> topMoviesByRevenue();
+
+    /** 按天统计票房（pay_time 前 10 位是日期） */
+    @Query("SELECT SUBSTRING(o.payTime, 1, 10), SUM(o.totalPrice), COUNT(o) " +
+           "FROM Order o WHERE o.status = 'paid' AND o.payTime IS NOT NULL " +
+           "GROUP BY SUBSTRING(o.payTime, 1, 10) " +
+           "ORDER BY SUBSTRING(o.payTime, 1, 10) ASC")
+    List<Object[]> dailyRevenue();
 }
