@@ -15,7 +15,7 @@ public class Movie {
     @Column(length = 100)
     private String title;
 
-    @Column(length = 500)  // 防止渐变色字符串过长
+    @Column(length = 500)
     private String poster;
 
     private Double score;
@@ -26,8 +26,19 @@ public class Movie {
     @Column(length = 50)
     private String releaseDate;
 
-    @Column(length = 20)   // showing / upcoming
+    @Column(length = 20)
     private String status;
 
     private Integer wantCount;
+
+    /** 导演（新增） */
+    @Column(length = 100)
+    private String director;
+
+    /** 主演，逗号分隔（新增） */
+    @Column(length = 500)
+    private String actors;
+
+    /** 时长，分钟（新增） */
+    private Integer duration;
 }

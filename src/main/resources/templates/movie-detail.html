@@ -30,7 +30,7 @@
         .movie-meta { font-size: 14px; color: #ccc; margin-bottom: 6px; }
         .movie-actions { display: flex; gap: 15px; margin: 20px 0; }
         .action-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-size: 14px; }
-        .buy-ticket-btn { display: inline-block; background: #1e3a8a; color: #fff; padding: 12px 40px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        .buy-ticket-btn { display: inline-block; background: #1e3a8a; color: #fff; padding: 12px 40px; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; border: none; }
         .buy-ticket-btn:hover { background: #152c6b; }
         .movie-stats { text-align: right; margin-left: auto; flex-shrink: 0; }
         .rating-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
@@ -39,6 +39,11 @@
         .rating-count { font-size: 12px; color: #ccc; margin-bottom: 20px; }
         .box-office-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
         .box-office-value { font-size: 24px; color: #fff; font-weight: bold; }
+
+        /* ★ 详情行（新） */
+        .movie-detail-row { display: flex; gap: 30px; margin-bottom: 10px; font-size: 14px; color: #ccc; }
+        .movie-detail-row .label { color: #888; }
+        .movie-detail-row .value { color: #fff; }
 
         .container { width: 1200px; margin: 0 auto; padding: 30px 0 60px; display: flex; gap: 40px; }
         .main-content { flex: 1; }
@@ -122,9 +127,28 @@
             </div>
             <div class="movie-info">
                 <h1 class="movie-title" th:text="${movie != null ? movie.title : '未知电影'}">电影标题</h1>
+
                 <div class="movie-meta" th:if="${movie != null}"
                      th:text="${movie.releaseDate} + ' 中国大陆上映'">上映日期</div>
-                <div class="movie-meta">类型 / 时长 / 地区</div>
+
+                <!-- ★ 新增：导演 -->
+                <div class="movie-detail-row" th:if="${movie != null and movie.director != null}">
+                    <span class="label">导演：</span>
+                    <span class="value" th:text="${movie.director}">导演名</span>
+                </div>
+
+                <!-- ★ 新增：主演 -->
+                <div class="movie-detail-row" th:if="${movie != null and movie.actors != null}">
+                    <span class="label">主演：</span>
+                    <span class="value" th:text="${movie.actors}">演员列表</span>
+                </div>
+
+                <!-- ★ 新增：时长 -->
+                <div class="movie-detail-row" th:if="${movie != null and movie.duration != null}">
+                    <span class="label">片长：</span>
+                    <span class="value" th:text="${movie.duration} + ' 分钟'">0 分钟</span>
+                </div>
+
                 <div class="movie-actions">
                     <button class="action-btn">♡ 想看</button>
                     <button class="action-btn">★ 评分</button>
@@ -194,7 +218,8 @@
                 </div>
                 <div class="fact-card">
                     <div class="fact-label">⚙️ 技术参数</div>
-                    <div class="fact-value">2小时40分钟</div>
+                    <div class="fact-value"
+                         th:text="${movie != null and movie.duration != null ? movie.duration + ' 分钟' : '2小时40分钟'}">2小时40分钟</div>
                 </div>
             </div>
 
