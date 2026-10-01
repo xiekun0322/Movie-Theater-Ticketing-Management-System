@@ -9,11 +9,9 @@
         a { text-decoration: none; color: inherit; }
         ul, li { list-style: none; }
 
-        .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center;
-            padding: 0 15%; position: sticky; top: 0; background: #fff; z-index: 100; }
+        .top-nav { height: 80px; border-bottom: 1px solid #e5e5e5; display: flex; align-items: center; padding: 0 15%; position: sticky; top: 0; background: #fff; z-index: 100; }
         .logo { display: flex; align-items: center; margin-right: 40px; }
-        .logo-icon { width: 40px; height: 40px; background: #1e3a8a; border-radius: 50%; color: #fff;
-            display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
+        .logo-icon { width: 40px; height: 40px; background: #1e3a8a; border-radius: 50%; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 18px; margin-right: 10px; }
         .logo-text { font-size: 20px; font-weight: bold; }
         .main-menu { display: flex; height: 100%; }
         .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
@@ -22,25 +20,19 @@
         .wrap { width: 1000px; margin: 30px auto 60px; }
         .page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #1e3a8a; }
 
-        /* ★ 状态筛选 tabs（新增） */
-        .status-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #fff;
-            border-radius: 6px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-        .status-tab { padding: 10px 24px; border-radius: 4px; font-size: 14px; color: #666;
-            cursor: pointer; transition: all 0.2s; }
+        .status-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: #fff; border-radius: 6px; padding: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .status-tab { padding: 10px 24px; border-radius: 4px; font-size: 14px; color: #666; cursor: pointer; transition: all 0.2s; }
         .status-tab:hover { background: #f8f8f8; }
         .status-tab.active { background: #1e3a8a; color: #fff; font-weight: bold; }
 
-        .order-card { background: #fff; border-radius: 6px; margin-bottom: 16px; padding: 20px 25px;
-            display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+        .order-card { background: #fff; border-radius: 6px; margin-bottom: 16px; padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         .order-left { flex: 1; min-width: 0; }
         .order-no { font-size: 12px; color: #999; margin-bottom: 8px; }
         .order-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; }
         .order-meta { font-size: 13px; color: #666; line-height: 1.9; }
         .order-meta .label { color: #999; display: inline-block; width: 48px; }
 
-        .ticket-code-inline { display: inline-block; margin-top: 10px;
-            background: #f0fff4; border: 1px dashed #43a047; color: #2e7d32;
-            padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; letter-spacing: 2px; }
+        .ticket-code-inline { display: inline-block; margin-top: 10px; background: #f0fff4; border: 1px dashed #43a047; color: #2e7d32; padding: 4px 12px; border-radius: 4px; font-size: 13px; font-weight: bold; letter-spacing: 2px; }
 
         .order-right { text-align: right; margin-left: 20px; flex-shrink: 0; }
         .order-price { font-size: 22px; color: #1e3a8a; font-weight: bold; margin-bottom: 10px; }
@@ -51,17 +43,24 @@
         .status.paid      { background: #e8f5e9; color: #43a047; }
         .status.cancelled { background: #f5f5f5; color: #999; }
 
-        .view-btn { display: inline-block; margin-top: 12px; background: #1e3a8a; color: #fff;
-            padding: 8px 22px; border-radius: 4px; font-size: 14px; transition: background 0.3s; }
+        .view-btn { display: inline-block; margin-top: 12px; background: #1e3a8a; color: #fff; padding: 8px 22px; border-radius: 4px; font-size: 14px; transition: background 0.3s; }
         .view-btn:hover { background: #152c6b; }
         .view-btn.ghost { background: #fff; color: #1e3a8a; border: 1px solid #1e3a8a; }
-        .view-btn.ghost:hover { background: #fff5f4; }
+        .view-btn.ghost:hover { background: #eef2ff; }
 
         .empty { text-align: center; padding: 100px 0; color: #999; background: #fff; border-radius: 6px; }
         .empty a { color: #1e3a8a; }
 
-        .footer { background: #262426; color: #999; padding: 40px 0; font-size: 12px;
-            line-height: 2; text-align: center; }
+        /* ★ 分页导航 */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; }
+        .pagination a, .pagination span { display: inline-block; padding: 8px 16px; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
+        .pagination a { background: #fff; color: #333; border: 1px solid #e5e5e5; cursor: pointer; }
+        .pagination a:hover { border-color: #1e3a8a; color: #1e3a8a; }
+        .pagination .current { background: #1e3a8a; color: #fff; font-weight: bold; }
+        .pagination .disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; border: 1px solid #e5e5e5; }
+        .pagination .info { color: #999; font-size: 13px; }
+
+        .footer { background: #262426; color: #999; padding: 40px 0; font-size: 12px; line-height: 2; text-align: center; }
         .footer a { color: #1e3a8a; }
     </style>
 </head>
@@ -88,56 +87,77 @@
 <div class="wrap">
     <div class="page-title">我的订单</div>
 
-    <!-- ★ 状态筛选 tabs -->
+    <!-- 状态筛选 tabs -->
     <div class="status-tabs">
-        <a th:href="@{/orders(status='all')}"
+        <a th:href="@{/orders(status='all', page=0)}"
            class="status-tab"
-           th:classappend="${currentStatus == 'all'} ? 'active' : ''">全部</a>
-        <a th:href="@{/orders(status='pending')}"
+           th:classappend="${currentStatus == 'all' ? 'active' : ''}">全部</a>
+        <a th:href="@{/orders(status='pending', page=0)}"
            class="status-tab"
-           th:classappend="${currentStatus == 'pending'} ? 'active' : ''">待支付</a>
-        <a th:href="@{/orders(status='paid')}"
+           th:classappend="${currentStatus == 'pending' ? 'active' : ''}">待支付</a>
+        <a th:href="@{/orders(status='paid', page=0)}"
            class="status-tab"
-           th:classappend="${currentStatus == 'paid'} ? 'active' : ''">已支付</a>
-        <a th:href="@{/orders(status='cancelled')}"
+           th:classappend="${currentStatus == 'paid' ? 'active' : ''}">已支付</a>
+        <a th:href="@{/orders(status='cancelled', page=0)}"
            class="status-tab"
-           th:classappend="${currentStatus == 'cancelled'} ? 'active' : ''">已取消</a>
+           th:classappend="${currentStatus == 'cancelled' ? 'active' : ''}">已取消</a>
     </div>
 
     <!-- 空状态 -->
-    <div class="empty" th:if="${orders == null or orders.isEmpty()}">
+    <div class="empty" th:if="${orderPage == null or orderPage.isEmpty()}">
         还没有订单，去 <a th:href="@{/}">首页</a> 选一部电影吧～
     </div>
 
-    <!-- 订单卡片 -->
-    <div class="order-card" th:each="o : ${orders}">
-        <div class="order-left">
-            <div class="order-no">订单号：<span th:text="${o.orderNo}">MO...</span></div>
-            <div class="order-title" th:text="${o.movieTitle}">电影名</div>
-            <div class="order-meta">
-                <div><span class="label">影院</span><span th:text="${o.cinemaName}">-</span> · <span th:text="${o.hallName}">-</span></div>
-                <div><span class="label">场次</span><span th:text="${o.showTime}">-</span></div>
-                <div><span class="label">座位</span><span th:text="${o.seats}">-</span></div>
+    <!-- 订单卡片列表 -->
+    <div th:if="${orderPage != null and !orderPage.isEmpty()}">
+        <div class="order-card" th:each="o : ${orderPage.content}">
+            <div class="order-left">
+                <div class="order-no">订单号：<span th:text="${o.orderNo}">MO...</span></div>
+                <div class="order-title" th:text="${o.movieTitle}">电影名</div>
+                <div class="order-meta">
+                    <div><span class="label">影院</span><span th:text="${o.cinemaName}">-</span> · <span th:text="${o.hallName}">-</span></div>
+                    <div><span class="label">场次</span><span th:text="${o.showTime}">-</span></div>
+                    <div><span class="label">座位</span><span th:text="${o.seats}">-</span></div>
+                </div>
+
+                <div th:if="${o.status == 'paid'}" class="ticket-code-inline">
+                    取票码：<span th:text="${o.ticketCode}">ABCD-1234</span>
+                </div>
             </div>
 
-            <!-- 已支付才显示取票码 -->
-            <div th:if="${o.status == 'paid'}" class="ticket-code-inline">
-                取票码：<span th:text="${o.ticketCode}">ABCD-1234</span>
+            <div class="order-right">
+                <div class="order-price" th:text="${o.totalPrice}">0</div>
+
+                <span class="status"
+                      th:classappend="${o.status}"
+                      th:text="${o.status == 'pending' ? '待支付' : (o.status == 'paid' ? '已支付' : '已取消')}">状态</span>
+
+                <div>
+                    <a th:if="${o.status == 'pending'}" class="view-btn" th:href="@{/order/{id}(id=${o.id})}">去支付</a>
+                    <a th:if="${o.status == 'paid'}" class="view-btn" th:href="@{/order/{id}(id=${o.id})}">查看票券</a>
+                    <a th:if="${o.status == 'cancelled'}" class="view-btn ghost" th:href="@{/order/{id}(id=${o.id})}">查看详情</a>
+                </div>
             </div>
         </div>
 
-        <div class="order-right">
-            <div class="order-price" th:text="${o.totalPrice}">0</div>
+        <!-- ★ 分页导航 -->
+        <div class="pagination" th:if="${orderPage.totalPages > 1}">
+            <!-- 上一页 -->
+            <a th:if="${orderPage.hasPrevious()}"
+               th:href="@{/orders(status=${currentStatus}, page=${currentPage - 1})}">上一页</a>
+            <span th:if="${!orderPage.hasPrevious()}" class="disabled">上一页</span>
 
-            <span class="status"
-                  th:classappend="${o.status}"
-                  th:text="${o.status == 'pending' ? '待支付' : (o.status == 'paid' ? '已支付' : '已取消')}">状态</span>
+            <!-- 页码信息 -->
+            <span class="info">
+                第 <span th:text="${orderPage.number + 1}">1</span> /
+                <span th:text="${orderPage.totalPages}">1</span> 页
+                （共 <span th:text="${orderPage.totalElements}">0</span> 条）
+            </span>
 
-            <div>
-                <a th:if="${o.status == 'pending'}" class="view-btn" th:href="@{/order/{id}(id=${o.id})}">去支付</a>
-                <a th:if="${o.status == 'paid'}" class="view-btn" th:href="@{/order/{id}(id=${o.id})}">查看票券</a>
-                <a th:if="${o.status == 'cancelled'}" class="view-btn ghost" th:href="@{/order/{id}(id=${o.id})}">查看详情</a>
-            </div>
+            <!-- 下一页 -->
+            <a th:if="${orderPage.hasNext()}"
+               th:href="@{/orders(status=${currentStatus}, page=${currentPage + 1})}">下一页</a>
+            <span th:if="${!orderPage.hasNext()}" class="disabled">下一页</span>
         </div>
     </div>
 </div>

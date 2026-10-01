@@ -12,6 +12,10 @@ import com.starscreen.repository.SeatRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +34,7 @@ public class OrderService {
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
 
     private static final int PAY_TIMEOUT_MINUTES = 10;
-
-    private static final DateTimeFormatter DTF =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Pattern SEAT_LABEL = Pattern.compile("^(\\d+)排(\\d+)座$");
     private static final int MAX_SEATS_PER_ORDER = 6;
 
@@ -170,12 +172,20 @@ public class OrderService {
         return orderRepository.findAllByOrderByIdDesc();
     }
 
-    /** 按状态查询（新增） */
     public List<Order> listByStatus(String status) {
         if (status == null || status.isEmpty() || "all".equals(status)) {
             return orderRepository.findAllByOrderByIdDesc();
         }
         return orderRepository.findByStatusOrderByIdDesc(status);
+    }
+
+    /** 分页查询（新增） */
+    public Page<Order> listPaged(String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
+        if (status == null || status.isEmpty() || "all".equals(status)) {
+            return orderRepository.findAllByOrderByIdDesc(pageable);
+        }
+        return orderRepository.findByStatusOrderByIdDesc(status, pageable);
     }
 
     public Order getById(Long id) {
