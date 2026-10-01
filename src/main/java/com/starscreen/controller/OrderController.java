@@ -6,20 +6,21 @@ import com.starscreen.entity.Order;
 import com.starscreen.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin
+@RequiredArgsConstructor
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    private final OrderService orderService;
 
     /** 我的订单列表 */
     @GetMapping
-    public Result<java.util.List<Order>> list(HttpSession session) {
+    public Result<List<Order>> list(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         if (userId == null) return Result.error(401, "请先登录");
         return Result.success(orderService.listPagedByUser(userId, "all", 0, 1000).getContent());

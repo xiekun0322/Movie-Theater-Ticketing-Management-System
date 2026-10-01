@@ -9,9 +9,9 @@ import com.starscreen.repository.MovieRepository;
 import com.starscreen.repository.OrderRepository;
 import com.starscreen.repository.ScheduleRepository;
 import com.starscreen.repository.SeatRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,18 +29,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class OrderService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
+
     private static final int PAY_TIMEOUT_MINUTES = 10;
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Pattern SEAT_LABEL = Pattern.compile("^(\\d+)排(\\d+)座$");
     private static final int MAX_SEATS_PER_ORDER = 6;
+    private static final Random RANDOM = new Random();
 
-    @Autowired private OrderRepository orderRepository;
-    @Autowired private SeatRepository seatRepository;
-    @Autowired private ScheduleRepository scheduleRepository;
-    @Autowired private MovieRepository movieRepository;
+    private final OrderRepository orderRepository;
+    private final SeatRepository seatRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final MovieRepository movieRepository;
 
     // ==================== 1. 锁座下单 ====================
     @Transactional
@@ -93,7 +96,7 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 2. 支付（校验用户） ====================
+    // ==================== 2. 支付 ====================
     @Transactional
     public Order pay(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -126,7 +129,7 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 3. 取消订单（校验用户） ====================
+    // ==================== 3. 取消订单 ====================
     @Transactional
     public Order cancel(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
@@ -147,7 +150,7 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 4. 定时取消超时订单（系统任务，不校验用户） ====================
+    // ==================== 4. 定时取消超时订单 ====================
     @Scheduled(fixedRate = 30_000)
     @Transactional
     public void cancelExpiredOrders() {
@@ -179,7 +182,6 @@ public class OrderService {
     }
 
     // ==================== 查询 ====================
-    /** 分页查询（按用户过滤） */
     public Page<Order> listPagedByUser(Long userId, String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         if (status == null || status.isEmpty() || "all".equals(status)) {
@@ -188,7 +190,6 @@ public class OrderService {
         return orderRepository.findByUserIdAndStatusOrderByIdDesc(userId, status, pageable);
     }
 
-    /** 后台统计用（全部订单） */
     public Page<Order> listPaged(String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         if (status == null || status.isEmpty() || "all".equals(status)) {
@@ -219,16 +220,15 @@ public class OrderService {
 
     private String generateOrderNo() {
         return "MO" + System.currentTimeMillis()
-                + String.format("%03d", new Random().nextInt(1000));
+                + String.format("%03d", RANDOM.nextInt(1000));
     }
 
     private String generateTicketCode() {
         String chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-        Random random = new Random();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 8; i++) {
             if (i == 4) sb.append('-');
-            sb.append(chars.charAt(random.nextInt(chars.length())));
+            sb.append(chars.charAt(RANDOM.nextInt(chars.length())));
         }
         return sb.toString();
     }

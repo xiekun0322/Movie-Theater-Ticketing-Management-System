@@ -3,36 +3,35 @@ package com.starscreen.controller;
 import com.starscreen.common.Result;
 import com.starscreen.dto.LoginRequest;
 import com.starscreen.dto.RegisterRequest;
+import com.starscreen.dto.UserVO;
 import com.starscreen.entity.User;
 import com.starscreen.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/user")
-@CrossOrigin
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     /** 注册 */
     @PostMapping("/register")
-    public Result<User> register(@RequestBody @Valid RegisterRequest req) {
+    public Result<UserVO> register(@RequestBody @Valid RegisterRequest req) {
         User user = userService.register(req);
-        return Result.success(user);
+        return Result.success(UserVO.from(user));
     }
 
     /** 登录 */
     @PostMapping("/login")
-    public Result<User> login(@RequestBody @Valid LoginRequest req, HttpSession session) {
+    public Result<UserVO> login(@RequestBody @Valid LoginRequest req, HttpSession session) {
         User user = userService.login(req);
-        // 登录成功 → 把 userId 放到 session
         session.setAttribute("userId", user.getId());
         session.setAttribute("username", user.getUsername());
-        return Result.success(user);
+        return Result.success(UserVO.from(user));
     }
 
     /** 登出 */
@@ -44,11 +43,11 @@ public class UserController {
 
     /** 获取当前登录用户 */
     @GetMapping("/current")
-    public Result<User> current(HttpSession session) {
+    public Result<UserVO> current(HttpSession session) {
         Object userId = session.getAttribute("userId");
         if (userId == null) {
             return Result.error(401, "未登录");
         }
-        return Result.success(userService.getById((Long) userId));
+        return Result.success(UserVO.from(userService.getById((Long) userId)));
     }
 }
