@@ -93,9 +93,7 @@ public class PageController {
                          @RequestParam(defaultValue = "10") int size,
                          Model model, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        if (userId == null) {
-            return "redirect:/login";
-        }
+        if (userId == null) return "redirect:/login";
 
         Page<Order> orderPage = orderService.listPagedByUser(userId, status, page, size);
         model.addAttribute("orderPage", orderPage);
@@ -114,6 +112,14 @@ public class PageController {
     @GetMapping("/admin/movies")
     public String adminMovies() {
         return "admin-movies";
+    }
+
+    /** 场次管理页 */
+    @GetMapping("/admin/schedules")
+    public String adminSchedules(@RequestParam(required = false) Long movieId, Model model) {
+        model.addAttribute("movieId", movieId);
+        model.addAttribute("movies", movieRepository.findAll());
+        return "admin-schedules";
     }
 
     @GetMapping("/login")

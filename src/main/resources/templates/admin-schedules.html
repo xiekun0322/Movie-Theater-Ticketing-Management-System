@@ -2,7 +2,7 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>电影管理 - 星幕影票</title>
+    <title>场次管理 - 星幕影票</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Microsoft YaHei", Arial, sans-serif; background: #f5f5f5; color: #333; font-size: 14px; }
@@ -26,64 +26,42 @@
         .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
         .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
 
-        .wrap { width: 1200px; margin: 30px auto 60px; }
+        .wrap { width: 1300px; margin: 30px auto 60px; }
 
-        /* 顶部工具栏 */
         .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .page-title { font-size: 24px; font-weight: bold; color: #1e3a8a; }
+        .toolbar-right { display: flex; align-items: center; gap: 12px; }
+        .filter-select { height: 40px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px; outline: none; background: #fff; }
         .add-btn { background: #1e3a8a; color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; transition: background 0.3s; }
         .add-btn:hover { background: #152c6b; }
 
-        /* 表格 */
         .table-card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 12px 10px; color: #999; font-weight: normal; font-size: 13px; border-bottom: 2px solid #f0f0f0; }
         td { padding: 14px 10px; border-bottom: 1px solid #f5f5f5; font-size: 14px; }
         tr:last-child td { border-bottom: none; }
 
-        .movie-thumb {
-            width: 50px; height: 70px; border-radius: 4px;
-            background-size: cover; background-position: center; background-color: #f0f0f0;
-        }
-
-        .status-tag { display: inline-block; padding: 2px 8px; border-radius: 3px; font-size: 12px; }
-        .status-tag.showing { background: #e8f5e9; color: #43a047; }
-        .status-tag.upcoming { background: #fff3e0; color: #ff9800; }
-
-        .op-btn { display: inline-block; padding: 5px 12px; border-radius: 3px; font-size: 13px; cursor: pointer; border: none; margin-right: 6px; transition: all 0.2s; }
+        .op-btn { display: inline-block; padding: 5px 12px; border-radius: 3px; font-size: 13px; cursor: pointer; border: none; margin-right: 6px; }
         .op-btn.edit { background: #eef2ff; color: #1e3a8a; }
         .op-btn.edit:hover { background: #dbe4ff; }
         .op-btn.delete { background: #fef0f0; color: #dc2626; }
         .op-btn.delete:hover { background: #fee2e2; }
 
-        /* 分页 */
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 20px; }
         .pagination button { padding: 8px 16px; border-radius: 4px; border: 1px solid #e5e5e5; background: #fff; cursor: pointer; font-size: 14px; }
         .pagination button:disabled { background: #f5f5f5; color: #ccc; cursor: not-allowed; }
         .pagination .info { color: #999; font-size: 13px; }
 
-        /* 弹窗 */
-        .modal-mask {
-            display: none; position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5); z-index: 2000;
-            justify-content: center; align-items: center;
-        }
+        .modal-mask { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
         .modal-mask.show { display: flex; }
-        .modal {
-            background: #fff; border-radius: 8px;
-            width: 560px; max-height: 90vh; overflow-y: auto;
-            padding: 30px;
-        }
+        .modal { background: #fff; border-radius: 8px; width: 600px; max-height: 90vh; overflow-y: auto; padding: 30px; }
         .modal-title { font-size: 20px; font-weight: bold; margin-bottom: 20px; color: #1e3a8a; }
         .form-row { margin-bottom: 15px; }
         .form-row label { display: block; font-size: 13px; color: #666; margin-bottom: 5px; }
-        .form-row input, .form-row select, .form-row textarea {
-            width: 100%; height: 38px; border: 1px solid #ddd;
-            border-radius: 4px; padding: 0 12px; font-size: 14px;
-            outline: none; transition: border-color 0.3s;
-        }
-        .form-row textarea { height: 60px; padding: 10px 12px; resize: none; }
-        .form-row input:focus, .form-row select:focus, .form-row textarea:focus { border-color: #1e3a8a; }
+        .form-row input, .form-row select { width: 100%; height: 38px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px; outline: none; transition: border-color 0.3s; }
+        .form-row input:focus, .form-row select:focus { border-color: #1e3a8a; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
         .btn-cancel { padding: 10px 24px; border: 1px solid #ddd; background: #fff; border-radius: 4px; cursor: pointer; font-size: 14px; color: #666; }
@@ -103,8 +81,8 @@
     </div>
     <ul class="main-menu">
         <li><a th:href="@{/admin}">数据概览</a></li>
-        <li class="active"><a th:href="@{/admin/movies}">电影管理</a></li>
-        <li><a th:href="@{/admin/schedules}">场次管理</a></li>
+        <li><a th:href="@{/admin/movies}">电影管理</a></li>
+        <li class="active"><a th:href="@{/admin/schedules}">场次管理</a></li>
         <li><a th:href="@{/orders}">订单</a></li>
     </ul>
     <div class="nav-right">
@@ -123,25 +101,33 @@
 
 <div class="wrap">
     <div class="toolbar">
-        <div class="page-title">电影管理</div>
-        <button class="add-btn" id="addBtn">+ 新增电影</button>
+        <div class="page-title">场次管理</div>
+        <div class="toolbar-right">
+            <select class="filter-select" id="movieFilter">
+                <option value="">全部电影</option>
+                <option th:each="m : ${movies}"
+                        th:value="${m.id}"
+                        th:text="${m.title}">电影名</option>
+            </select>
+            <button class="add-btn" id="addBtn">+ 新增场次</button>
+        </div>
     </div>
 
     <div class="table-card">
         <table>
             <thead>
             <tr>
-                <th style="width:80px;">海报</th>
-                <th>电影名</th>
-                <th style="width:80px;">评分</th>
-                <th style="width:100px;">状态</th>
-                <th style="width:120px;">上映日期</th>
-                <th style="width:120px;">时长</th>
-                <th style="width:180px;">操作</th>
+                <th style="width:60px;">ID</th>
+                <th>电影</th>
+                <th>影院</th>
+                <th style="width:100px;">影厅</th>
+                <th style="width:180px;">时间</th>
+                <th style="width:100px;">语言</th>
+                <th style="width:80px;">票价</th>
+                <th style="width:140px;">操作</th>
             </tr>
             </thead>
-            <tbody id="movieTableBody">
-            </tbody>
+            <tbody id="scheduleTableBody"></tbody>
         </table>
 
         <div class="pagination" id="pagination"></div>
@@ -151,48 +137,59 @@
 <!-- 新增/编辑弹窗 -->
 <div class="modal-mask" id="modalMask">
     <div class="modal">
-        <div class="modal-title" id="modalTitle">新增电影</div>
+        <div class="modal-title" id="modalTitle">新增场次</div>
 
-        <input type="hidden" id="movieId">
+        <input type="hidden" id="scheduleId">
 
         <div class="form-row">
-            <label>电影名 *</label>
-            <input type="text" id="title" placeholder="例如：八仙！">
-        </div>
-        <div class="form-row">
-            <label>海报路径</label>
-            <input type="text" id="poster" placeholder="/images/poster1.jpg">
-        </div>
-        <div class="form-row">
-            <label>导演</label>
-            <input type="text" id="director" placeholder="例如：张艺谋">
-        </div>
-        <div class="form-row">
-            <label>主演（逗号分隔）</label>
-            <input type="text" id="actors" placeholder="何仙姑,吕洞宾,铁拐李">
-        </div>
-        <div class="form-row">
-            <label>时长（分钟）</label>
-            <input type="number" id="duration" placeholder="120">
-        </div>
-        <div class="form-row">
-            <label>评分</label>
-            <input type="number" step="0.1" id="score" placeholder="9.5">
-        </div>
-        <div class="form-row">
-            <label>标签</label>
-            <input type="text" id="tag" placeholder="2DIMAX">
-        </div>
-        <div class="form-row">
-            <label>上映日期</label>
-            <input type="date" id="releaseDate">
-        </div>
-        <div class="form-row">
-            <label>状态</label>
-            <select id="status">
-                <option value="showing">正在热映</option>
-                <option value="upcoming">即将上映</option>
+            <label>电影 *</label>
+            <select id="movieId">
+                <option value="">请选择电影</option>
+                <option th:each="m : ${movies}" th:value="${m.id}" th:text="${m.title}">电影名</option>
             </select>
+        </div>
+
+        <div class="form-row">
+            <label>影院名 *</label>
+            <input type="text" id="cinemaName" placeholder="厦门华侨大学店">
+        </div>
+
+        <div class="form-grid">
+            <div class="form-row">
+                <label>影院 ID</label>
+                <input type="number" id="cinemaId" placeholder="1">
+            </div>
+            <div class="form-row">
+                <label>影厅 *</label>
+                <input type="text" id="hallName" placeholder="1号厅">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-row">
+                <label>开始时间 *</label>
+                <input type="text" id="startTime" placeholder="10:30">
+            </div>
+            <div class="form-row">
+                <label>散场时间</label>
+                <input type="text" id="endTime" placeholder="12:54">
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="form-row">
+                <label>放映日期 *</label>
+                <input type="date" id="date">
+            </div>
+            <div class="form-row">
+                <label>票价 *</label>
+                <input type="number" step="0.1" id="price" placeholder="35.0">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <label>语言版本</label>
+            <input type="text" id="language" placeholder="国语 2D">
         </div>
 
         <div class="form-actions">
@@ -211,15 +208,19 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentPage = 0;
     const pageSize = 10;
     let totalPages = 1;
+    let filterMovieId = '';
 
-    const tbody = document.getElementById('movieTableBody');
+    const tbody = document.getElementById('scheduleTableBody');
     const pagination = document.getElementById('pagination');
     const modalMask = document.getElementById('modalMask');
     const modalTitle = document.getElementById('modalTitle');
+    const movieFilter = document.getElementById('movieFilter');
 
-    // 加载列表
-    function loadMovies(page) {
-        fetch('/api/admin/movies?page=' + page + '&size=' + pageSize)
+    function loadSchedules(page) {
+        let url = '/api/admin/schedules?page=' + page + '&size=' + pageSize;
+        if (filterMovieId) url += '&movieId=' + filterMovieId;
+
+        fetch(url)
             .then(res => res.json())
             .then(result => {
                 if (result.code !== 200) throw new Error(result.message);
@@ -231,29 +232,24 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(err => alert('加载失败：' + err.message));
     }
 
-    function renderTable(movies) {
-        if (!movies || movies.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999;padding:60px;">暂无电影数据</td></tr>';
+    function renderTable(schedules) {
+        if (!schedules || schedules.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999;padding:60px;">暂无场次数据</td></tr>';
             return;
         }
 
-        tbody.innerHTML = movies.map(m => `
+        tbody.innerHTML = schedules.map(s => `
             <tr>
+                <td>${s.id}</td>
+                <td>${s.movieTitle || ('电影 ' + s.movieId)}</td>
+                <td>${s.cinemaName || '-'}</td>
+                <td>${s.hallName || '-'}</td>
+                <td>${s.date || ''} ${s.startTime || ''}</td>
+                <td>${s.language || '-'}</td>
+                <td>¥${s.price || 0}</td>
                 <td>
-                    <div class="movie-thumb" style="background-image: url('${m.poster || ''}')"></div>
-                </td>
-                <td><strong>${m.title || '-'}</strong></td>
-                <td>${m.score != null ? m.score : '-'}</td>
-                <td>
-                    <span class="status-tag ${m.status}">
-                        ${m.status === 'showing' ? '正在热映' : '即将上映'}
-                    </span>
-                </td>
-                <td>${m.releaseDate || '-'}</td>
-                <td>${m.duration != null ? m.duration + ' 分钟' : '-'}</td>
-                <td>
-                    <button class="op-btn edit" onclick="editMovie(${m.id})">编辑</button>
-                    <button class="op-btn delete" onclick="deleteMovie(${m.id}, '${m.title}')">删除</button>
+                    <button class="op-btn edit" onclick="editSchedule(${s.id})">编辑</button>
+                    <button class="op-btn delete" onclick="deleteSchedule(${s.id})">删除</button>
                 </td>
             </tr>
         `).join('');
@@ -269,89 +265,84 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
     }
 
-    // 全局函数（onclick 用）
     window.gotoPage = function (page) {
         if (page < 0 || page >= totalPages) return;
-        loadMovies(page);
+        loadSchedules(page);
     };
 
-    window.deleteMovie = function (id, title) {
-        if (!confirm(`确定要删除电影《${title}》吗？`)) return;
-
-        fetch('/api/admin/movies/' + id, { method: 'DELETE' })
+    window.deleteSchedule = function (id) {
+        if (!confirm('确定要删除该场次吗？')) return;
+        fetch('/api/admin/schedules/' + id, { method: 'DELETE' })
             .then(res => res.json())
             .then(result => {
                 if (result.code !== 200) throw new Error(result.message);
                 alert('删除成功');
-                loadMovies(currentPage);
+                loadSchedules(currentPage);
             })
             .catch(err => alert('删除失败：' + err.message));
     };
 
-    window.editMovie = function (id) {
-        fetch('/api/admin/movies/' + id)
+    window.editSchedule = function (id) {
+        fetch('/api/admin/schedules/' + id)
             .then(res => res.json())
             .then(result => {
                 if (result.code !== 200) throw new Error(result.message);
-                const m = result.data;
-                modalTitle.textContent = '编辑电影';
-                document.getElementById('movieId').value = m.id;
-                document.getElementById('title').value = m.title || '';
-                document.getElementById('poster').value = m.poster || '';
-                document.getElementById('director').value = m.director || '';
-                document.getElementById('actors').value = m.actors || '';
-                document.getElementById('duration').value = m.duration || '';
-                document.getElementById('score').value = m.score || '';
-                document.getElementById('tag').value = m.tag || '';
-                document.getElementById('releaseDate').value = m.releaseDate || '';
-                document.getElementById('status').value = m.status || 'showing';
+                const s = result.data;
+                modalTitle.textContent = '编辑场次';
+                document.getElementById('scheduleId').value = s.id;
+                document.getElementById('movieId').value = s.movieId || '';
+                document.getElementById('cinemaId').value = s.cinemaId || '';
+                document.getElementById('cinemaName').value = s.cinemaName || '';
+                document.getElementById('hallName').value = s.hallName || '';
+                document.getElementById('startTime').value = s.startTime || '';
+                document.getElementById('endTime').value = s.endTime || '';
+                document.getElementById('date').value = s.date || '';
+                document.getElementById('price').value = s.price || '';
+                document.getElementById('language').value = s.language || '';
                 modalMask.classList.add('show');
             })
             .catch(err => alert('加载失败：' + err.message));
     };
 
-    // 新增
     document.getElementById('addBtn').addEventListener('click', function () {
-        modalTitle.textContent = '新增电影';
-        document.getElementById('movieId').value = '';
-        document.getElementById('title').value = '';
-        document.getElementById('poster').value = '/images/poster1.jpg';
-        document.getElementById('director').value = '';
-        document.getElementById('actors').value = '';
-        document.getElementById('duration').value = '';
-        document.getElementById('score').value = '';
-        document.getElementById('tag').value = '';
-        document.getElementById('releaseDate').value = '';
-        document.getElementById('status').value = 'showing';
+        modalTitle.textContent = '新增场次';
+        document.getElementById('scheduleId').value = '';
+        document.getElementById('movieId').value = filterMovieId || '';
+        document.getElementById('cinemaId').value = '1';
+        document.getElementById('cinemaName').value = '厦门华侨大学店';
+        document.getElementById('hallName').value = '1号厅';
+        document.getElementById('startTime').value = '';
+        document.getElementById('endTime').value = '';
+        document.getElementById('date').value = '';
+        document.getElementById('price').value = '35.0';
+        document.getElementById('language').value = '国语 2D';
         modalMask.classList.add('show');
     });
 
-    // 取消
     document.getElementById('cancelBtn').addEventListener('click', function () {
         modalMask.classList.remove('show');
     });
 
-    // 提交
     document.getElementById('submitBtn').addEventListener('click', function () {
-        const id = document.getElementById('movieId').value;
+        const id = document.getElementById('scheduleId').value;
         const payload = {
-            title: document.getElementById('title').value.trim(),
-            poster: document.getElementById('poster').value.trim(),
-            director: document.getElementById('director').value.trim(),
-            actors: document.getElementById('actors').value.trim(),
-            duration: parseInt(document.getElementById('duration').value) || null,
-            score: parseFloat(document.getElementById('score').value) || null,
-            tag: document.getElementById('tag').value.trim() || null,
-            releaseDate: document.getElementById('releaseDate').value || null,
-            status: document.getElementById('status').value
+            movieId: parseInt(document.getElementById('movieId').value) || null,
+            cinemaId: parseInt(document.getElementById('cinemaId').value) || null,
+            cinemaName: document.getElementById('cinemaName').value.trim(),
+            hallName: document.getElementById('hallName').value.trim(),
+            startTime: document.getElementById('startTime').value.trim(),
+            endTime: document.getElementById('endTime').value.trim() || null,
+            date: document.getElementById('date').value,
+            price: parseFloat(document.getElementById('price').value) || 35.0,
+            language: document.getElementById('language').value.trim() || '国语 2D'
         };
 
-        if (!payload.title) {
-            alert('电影名不能为空');
+        if (!payload.movieId || !payload.cinemaName || !payload.hallName || !payload.startTime || !payload.date) {
+            alert('请填写必填项（电影、影院、影厅、开始时间、放映日期）');
             return;
         }
 
-        const url = id ? '/api/admin/movies/' + id : '/api/admin/movies';
+        const url = id ? '/api/admin/schedules/' + id : '/api/admin/schedules';
         const method = id ? 'PUT' : 'POST';
 
         fetch(url, {
@@ -364,9 +355,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (result.code !== 200) throw new Error(result.message);
             alert(id ? '更新成功' : '新增成功');
             modalMask.classList.remove('show');
-            loadMovies(currentPage);
+            loadSchedules(currentPage);
         })
         .catch(err => alert('保存失败：' + err.message));
+    });
+
+    // 电影筛选
+    movieFilter.addEventListener('change', function () {
+        filterMovieId = this.value;
+        loadSchedules(0);
     });
 
     // 登出
@@ -380,8 +377,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 启动
-    loadMovies(0);
+    loadSchedules(0);
 });
 </script>
 
