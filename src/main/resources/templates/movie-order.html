@@ -18,6 +18,14 @@
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-name { color: #333; font-size: 14px; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); min-width: 120px; padding: 8px 0; z-index: 1000; }
+        .user-dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
+
         .container { width: 900px; margin: 40px auto 60px; }
 
         .tip-box { background: #eef2ff; padding: 20px 30px; border-radius: 4px; display: flex; align-items: center; margin-bottom: 30px; }
@@ -77,8 +85,21 @@
     </ul>
     <div class="nav-right">
         <div>📱 APP下载 ▼</div>
-        <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
-        <div>👤 ▼</div>
+
+        <div th:if="${session.username == null}">
+            <a th:href="@{/login}" style="color:#1e3a8a; font-weight:bold;">登录 / 注册</a>
+        </div>
+
+        <div th:if="${session.username != null}" class="user-menu">
+            <a th:href="@{/orders}"><span style="color:#1e3a8a;">🎟️ 我的订单</span></a>
+            <div class="user-dropdown">
+                <span class="user-name">👤 <span th:text="${session.username}">用户名</span> ▼</span>
+                <div class="dropdown-menu">
+                    <a th:href="@{/orders}">我的订单</a>
+                    <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+                </div>
+            </div>
+        </div>
     </div>
 </header>
 
@@ -257,6 +278,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     cancelBtn.textContent = '取消订单';
                     if (payBtn) payBtn.disabled = false;
                 });
+        });
+    }
+
+    // 登出
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            if (!confirm('确定要退出登录吗？')) return;
+            fetch('/api/user/logout', { method: 'POST' })
+                .then(res => res.json())
+                .then(() => { window.location.href = '/'; })
+                .catch(() => { window.location.href = '/'; });
         });
     }
 });

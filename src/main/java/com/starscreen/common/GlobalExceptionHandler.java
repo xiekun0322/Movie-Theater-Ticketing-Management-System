@@ -2,15 +2,14 @@ package com.starscreen.common;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-/**
- * 全局异常处理
- * 拦截所有 Controller 抛出的异常，统一返回 Result 格式
- */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -32,6 +31,12 @@ public class GlobalExceptionHandler {
             msg = fieldError.getDefaultMessage();
         }
         return Result.error(400, msg);
+    }
+
+    /** 静态资源 404（favicon、devtools 等）—— 不打印堆栈，直接返回 404 */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> handleNoResource(NoResourceFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     /** 兜底 */

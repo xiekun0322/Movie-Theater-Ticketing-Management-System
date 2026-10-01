@@ -20,6 +20,14 @@
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-name { color: #333; font-size: 14px; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); min-width: 120px; padding: 8px 0; z-index: 1000; }
+        .user-dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
+
         .step-bar { width: 1200px; margin: 30px auto 20px; display: flex; justify-content: center; align-items: center; position: relative; }
         .step { display: flex; align-items: center; flex-direction: column; position: relative; z-index: 2; width: 200px; }
         .step-circle { width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 2px solid #c7d2fe; color: #c7d2fe; display: flex; justify-content: center; align-items: center; font-size: 14px; margin-bottom: 10px; font-weight: bold; transition: all 0.3s; }
@@ -100,8 +108,21 @@
         </ul>
         <div class="nav-right">
             <div>📱 APP下载 ▼</div>
-            <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
-            <div>👤 ▼</div>
+
+            <div th:if="${session.username == null}">
+                <a th:href="@{/login}" style="color:#1e3a8a; font-weight:bold;">登录 / 注册</a>
+            </div>
+
+            <div th:if="${session.username != null}" class="user-menu">
+                <a th:href="@{/orders}"><span style="color:#1e3a8a;">🎟️ 我的订单</span></a>
+                <div class="user-dropdown">
+                    <span class="user-name">👤 <span th:text="${session.username}">用户名</span> ▼</span>
+                    <div class="dropdown-menu">
+                        <a th:href="@{/orders}">我的订单</a>
+                        <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -187,21 +208,36 @@
 
             let selectedSeats = [];
 
+            // ---------- 加载座位 ----------
             function loadSeats() {
+                console.log('loadSeats 开始, scheduleId =', scheduleId);
+
                 fetch('/api/seats/schedule/' + scheduleId)
                     .then(res => res.json())
                     .then(result => {
+                        console.log('接口返回:', result);
                         if (result.code !== 200) throw new Error(result.message);
+                        if (!result.data || result.data.length === 0) {
+                            console.warn('座位数据为空！');
+                            seatMap.innerHTML = '<div style="padding:40px;color:#999;">暂无座位数据</div>';
+                            return;
+                        }
                         renderSeats(result.data);
                     })
-                    .catch(() => alert('座位数据加载失败，请刷新重试'));
+                    .catch(err => {
+                        console.error('座位加载失败:', err);
+                        alert('座位数据加载失败：' + err.message);
+                    });
             }
 
+            // ---------- 渲染座位 ----------
             function renderSeats(seats) {
+                console.log('renderSeats 开始, 座位数 =', seats.length);
                 seatMap.innerHTML = '';
                 selectedSeats = [];
                 updateUI();
 
+                // 按排分组
                 const rowMap = {};
                 seats.forEach(s => {
                     if (!rowMap[s.rowNum]) rowMap[s.rowNum] = [];
@@ -234,8 +270,10 @@
                     });
                     seatMap.appendChild(rowDiv);
                 });
+                console.log('renderSeats 完成');
             }
 
+            // ---------- 点击座位 ----------
             function toggleSeat(seatEl, seatData) {
                 const idx = selectedSeats.findIndex(s => s.label === seatData.label);
                 if (idx >= 0) {
@@ -258,6 +296,7 @@
                 updateUI();
             }
 
+            // ---------- 更新 UI ----------
             function updateUI() {
                 selectedSeatsContainer.innerHTML = '';
                 selectedSeats.forEach(s => {
@@ -283,7 +322,7 @@
                 }
             }
 
-            // ---------- 提交锁座（含登录检查） ----------
+            // ---------- 提交锁座 ----------
             confirmBtn.addEventListener('click', function () {
                 if (selectedSeats.length === 0) return;
 
@@ -304,7 +343,6 @@
                 .then(res => res.json())
                 .then(result => {
                     if (result.code === 401) {
-                        // 未登录
                         if (confirm('请先登录，是否前往登录页？')) {
                             window.location.href = '/login';
                         } else {
@@ -314,7 +352,6 @@
                         return;
                     }
                     if (result.code !== 200) throw new Error(result.message);
-                    // 成功 → 跳转订单详情页
                     window.location.href = '/order/' + result.data.id;
                 })
                 .catch(err => {
@@ -325,6 +362,19 @@
                 });
             });
 
+            // ---------- 登出 ----------
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    if (!confirm('确定要退出登录吗？')) return;
+                    fetch('/api/user/logout', { method: 'POST' })
+                        .then(res => res.json())
+                        .then(() => { window.location.href = '/'; })
+                        .catch(() => { window.location.href = '/'; });
+                });
+            }
+
+            // ---------- 启动 ----------
             loadSeats();
         });
     </script>

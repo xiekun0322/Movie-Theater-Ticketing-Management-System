@@ -20,6 +20,14 @@
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-name { color: #333; font-size: 14px; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); min-width: 120px; padding: 8px 0; z-index: 1000; }
+        .user-dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
+
         .movie-header { background: linear-gradient(to right, #0f172a, #1e3a8a); color: #fff; padding: 40px 0; }
         .movie-header-content { width: 1200px; margin: 0 auto; display: flex; align-items: flex-start; }
         .movie-poster { width: 240px; height: 340px; margin-right: 30px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #1a1a1a; position: relative; }
@@ -40,7 +48,6 @@
         .box-office-label { font-size: 13px; color: #ccc; margin-bottom: 5px; }
         .box-office-value { font-size: 24px; color: #fff; font-weight: bold; }
 
-        /* ★ 详情行（新） */
         .movie-detail-row { display: flex; gap: 30px; margin-bottom: 10px; font-size: 14px; color: #ccc; }
         .movie-detail-row .label { color: #888; }
         .movie-detail-row .value { color: #fff; }
@@ -113,8 +120,21 @@
         </ul>
         <div class="nav-right">
             <div>📱 APP下载 ▼</div>
-            <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
-            <div>👤 ▼</div>
+
+            <div th:if="${session.username == null}">
+                <a th:href="@{/login}" style="color:#1e3a8a; font-weight:bold;">登录 / 注册</a>
+            </div>
+
+            <div th:if="${session.username != null}" class="user-menu">
+                <a th:href="@{/orders}"><span style="color:#1e3a8a;">🎟️ 我的订单</span></a>
+                <div class="user-dropdown">
+                    <span class="user-name">👤 <span th:text="${session.username}">用户名</span> ▼</span>
+                    <div class="dropdown-menu">
+                        <a th:href="@{/orders}">我的订单</a>
+                        <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -131,19 +151,16 @@
                 <div class="movie-meta" th:if="${movie != null}"
                      th:text="${movie.releaseDate} + ' 中国大陆上映'">上映日期</div>
 
-                <!-- ★ 新增：导演 -->
                 <div class="movie-detail-row" th:if="${movie != null and movie.director != null}">
                     <span class="label">导演：</span>
                     <span class="value" th:text="${movie.director}">导演名</span>
                 </div>
 
-                <!-- ★ 新增：主演 -->
                 <div class="movie-detail-row" th:if="${movie != null and movie.actors != null}">
                     <span class="label">主演：</span>
                     <span class="value" th:text="${movie.actors}">演员列表</span>
                 </div>
 
-                <!-- ★ 新增：时长 -->
                 <div class="movie-detail-row" th:if="${movie != null and movie.duration != null}">
                     <span class="label">片长：</span>
                     <span class="value" th:text="${movie.duration} + ' 分钟'">0 分钟</span>
@@ -253,6 +270,21 @@
         <div>关于星幕：<a href="#">关于我们</a> | <a href="#">董事会成员</a></div>
         <div>©2026 星幕影票 www.starscreen.com</div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    if (!confirm('确定要退出登录吗？')) return;
+                    fetch('/api/user/logout', { method: 'POST' })
+                        .then(res => res.json())
+                        .then(() => { window.location.href = '/'; })
+                        .catch(() => { window.location.href = '/'; });
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>

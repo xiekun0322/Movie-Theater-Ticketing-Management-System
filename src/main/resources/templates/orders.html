@@ -17,6 +17,14 @@
         .main-menu li a { display: flex; align-items: center; height: 100%; padding: 0 20px; font-size: 16px; color: #333; }
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
 
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-name { color: #333; font-size: 14px; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); min-width: 120px; padding: 8px 0; z-index: 1000; }
+        .user-dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
+
         .wrap { width: 1000px; margin: 30px auto 60px; }
         .page-title { font-size: 24px; font-weight: bold; margin-bottom: 20px; color: #1e3a8a; }
 
@@ -51,7 +59,6 @@
         .empty { text-align: center; padding: 100px 0; color: #999; background: #fff; border-radius: 6px; }
         .empty a { color: #1e3a8a; }
 
-        /* ★ 分页导航 */
         .pagination { display: flex; justify-content: center; align-items: center; gap: 10px; margin-top: 30px; }
         .pagination a, .pagination span { display: inline-block; padding: 8px 16px; border-radius: 4px; font-size: 14px; transition: all 0.2s; }
         .pagination a { background: #fff; color: #333; border: 1px solid #e5e5e5; cursor: pointer; }
@@ -79,15 +86,27 @@
     </ul>
     <div class="nav-right">
         <div>📱 APP下载 ▼</div>
-        <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
-        <div>👤 ▼</div>
+
+        <div th:if="${session.username == null}">
+            <a th:href="@{/login}" style="color:#1e3a8a; font-weight:bold;">登录 / 注册</a>
+        </div>
+
+        <div th:if="${session.username != null}" class="user-menu">
+            <a th:href="@{/orders}"><span style="color:#1e3a8a;">🎟️ 我的订单</span></a>
+            <div class="user-dropdown">
+                <span class="user-name">👤 <span th:text="${session.username}">用户名</span> ▼</span>
+                <div class="dropdown-menu">
+                    <a th:href="@{/orders}">我的订单</a>
+                    <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+                </div>
+            </div>
+        </div>
     </div>
 </header>
 
 <div class="wrap">
     <div class="page-title">我的订单</div>
 
-    <!-- 状态筛选 tabs -->
     <div class="status-tabs">
         <a th:href="@{/orders(status='all', page=0)}"
            class="status-tab"
@@ -103,12 +122,10 @@
            th:classappend="${currentStatus == 'cancelled' ? 'active' : ''}">已取消</a>
     </div>
 
-    <!-- 空状态 -->
     <div class="empty" th:if="${orderPage == null or orderPage.isEmpty()}">
         还没有订单，去 <a th:href="@{/}">首页</a> 选一部电影吧～
     </div>
 
-    <!-- 订单卡片列表 -->
     <div th:if="${orderPage != null and !orderPage.isEmpty()}">
         <div class="order-card" th:each="o : ${orderPage.content}">
             <div class="order-left">
@@ -140,21 +157,17 @@
             </div>
         </div>
 
-        <!-- ★ 分页导航 -->
         <div class="pagination" th:if="${orderPage.totalPages > 1}">
-            <!-- 上一页 -->
             <a th:if="${orderPage.hasPrevious()}"
                th:href="@{/orders(status=${currentStatus}, page=${currentPage - 1})}">上一页</a>
             <span th:if="${!orderPage.hasPrevious()}" class="disabled">上一页</span>
 
-            <!-- 页码信息 -->
             <span class="info">
                 第 <span th:text="${orderPage.number + 1}">1</span> /
                 <span th:text="${orderPage.totalPages}">1</span> 页
                 （共 <span th:text="${orderPage.totalElements}">0</span> 条）
             </span>
 
-            <!-- 下一页 -->
             <a th:if="${orderPage.hasNext()}"
                th:href="@{/orders(status=${currentStatus}, page=${currentPage + 1})}">下一页</a>
             <span th:if="${!orderPage.hasNext()}" class="disabled">下一页</span>
@@ -166,6 +179,21 @@
     <div>关于星幕：<a href="#">关于我们</a> | <a href="#">董事会成员</a></div>
     <div>©2026 星幕影票 www.starscreen.com</div>
 </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            if (!confirm('确定要退出登录吗？')) return;
+            fetch('/api/user/logout', { method: 'POST' })
+                .then(res => res.json())
+                .then(() => { window.location.href = '/'; })
+                .catch(() => { window.location.href = '/'; });
+        });
+    }
+});
+</script>
 
 </body>
 </html>

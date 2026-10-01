@@ -21,21 +21,21 @@
         .nav-right { margin-left: auto; display: flex; align-items: center; gap: 20px; }
         .nav-right > div { cursor: pointer; }
 
-        /* ★ 搜索框 */
+        /* 搜索框 */
         .search-box { margin-left: 20px; display: flex; }
-        .search-box input {
-            width: 200px; height: 36px; border: 1px solid #ddd;
-            border-radius: 18px 0 0 18px; padding: 0 15px;
-            font-size: 14px; outline: none;
-            transition: border-color 0.3s;
-        }
+        .search-box input { width: 200px; height: 36px; border: 1px solid #ddd; border-radius: 18px 0 0 18px; padding: 0 15px; font-size: 14px; outline: none; transition: border-color 0.3s; }
         .search-box input:focus { border-color: #1e3a8a; }
-        .search-box button {
-            height: 36px; padding: 0 20px; border: none;
-            background: #1e3a8a; color: #fff; border-radius: 0 18px 18px 0;
-            font-size: 14px; cursor: pointer; transition: background 0.3s;
-        }
+        .search-box button { height: 36px; padding: 0 20px; border: none; background: #1e3a8a; color: #fff; border-radius: 0 18px 18px 0; font-size: 14px; cursor: pointer; transition: background 0.3s; }
         .search-box button:hover { background: #152c6b; }
+
+        /* 用户菜单 */
+        .user-menu { display: flex; align-items: center; gap: 20px; }
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-name { color: #333; font-size: 14px; }
+        .dropdown-menu { display: none; position: absolute; top: 100%; right: 0; background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); min-width: 120px; padding: 8px 0; z-index: 1000; }
+        .user-dropdown:hover .dropdown-menu { display: block; }
+        .dropdown-menu a { display: block; padding: 10px 20px; font-size: 14px; color: #333; transition: background 0.2s; }
+        .dropdown-menu a:hover { background: #f5f5f5; color: #1e3a8a; }
 
         .container { width: 1200px; margin: 0 auto; padding-top: 40px; display: flex; justify-content: space-between; }
         .main-content { width: 840px; }
@@ -89,7 +89,6 @@
         .floating-ad { position: fixed; bottom: 20px; left: 20px; width: 160px; height: 200px; background: #1e3a8a; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-size: 12px; z-index: 1000; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .qr-placeholder { width: 100px; height: 100px; background: #fff; margin-top: 10px; border-radius: 5px; }
 
-        /* 空搜索结果 */
         .empty-search { text-align: center; padding: 80px 0; color: #999; }
         .empty-search .icon { font-size: 48px; margin-bottom: 20px; opacity: 0.3; }
         .empty-search .text { font-size: 16px; margin-bottom: 10px; }
@@ -109,7 +108,6 @@
             <li><a href="#">影院</a></li>
             <li><a href="#">演出</a></li>
         </ul>
-        <!-- ★ 搜索框 -->
         <form class="search-box" th:action="@{/}" method="get">
             <input type="text" name="keyword" placeholder="搜索电影"
                    th:value="${keyword != null ? keyword : ''}">
@@ -117,15 +115,29 @@
         </form>
         <div class="nav-right">
             <div>📱 APP下载 ▼</div>
-            <a th:href="@{/orders}"><div style="color:#1e3a8a;">🎟️ 我的订单</div></a>
-            <div>👤 ▼</div>
+
+            <!-- 未登录 -->
+            <div th:if="${session.username == null}">
+                <a th:href="@{/login}" style="color:#1e3a8a; font-weight:bold;">登录 / 注册</a>
+            </div>
+
+            <!-- 已登录 -->
+            <div th:if="${session.username != null}" class="user-menu">
+                <a th:href="@{/orders}"><span style="color:#1e3a8a;">🎟️ 我的订单</span></a>
+                <div class="user-dropdown">
+                    <span class="user-name">👤 <span th:text="${session.username}">用户名</span> ▼</span>
+                    <div class="dropdown-menu">
+                        <a th:href="@{/orders}">我的订单</a>
+                        <a href="javascript:void(0)" id="logoutBtn">退出登录</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 
     <div class="container">
         <main class="main-content">
 
-            <!-- 搜索结果模式 -->
             <div th:if="${isSearching}">
                 <div class="section-title">
                     <h2>搜索 "<span th:text="${keyword}">关键词</span>" 的结果
@@ -133,7 +145,6 @@
                     <a th:href="@{/}" class="more-link">返回首页 ></a>
                 </div>
 
-                <!-- 有结果 -->
                 <div class="movie-grid" th:if="${!searchResults.isEmpty()}">
                     <div class="movie-card" th:each="movie : ${searchResults}">
                         <a th:href="@{/movie/detail/{id}(id=${movie.id})}">
@@ -151,7 +162,6 @@
                     </div>
                 </div>
 
-                <!-- 无结果 -->
                 <div class="empty-search" th:if="${searchResults.isEmpty()}">
                     <div class="icon">🔍</div>
                     <div class="text">没有找到与 <span class="keyword" th:text="${keyword}">xx</span> 相关的电影</div>
@@ -159,7 +169,6 @@
                 </div>
             </div>
 
-            <!-- 默认模式：正在热映 + 即将上映 -->
             <div th:if="${!isSearching}">
                 <section>
                     <div class="section-title">
@@ -272,6 +281,21 @@
         <div>手机扫码下载星幕APP</div>
         <div class="qr-placeholder"></div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function () {
+                    if (!confirm('确定要退出登录吗？')) return;
+                    fetch('/api/user/logout', { method: 'POST' })
+                        .then(res => res.json())
+                        .then(() => { window.location.href = '/'; })
+                        .catch(() => { window.location.href = '/'; });
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
