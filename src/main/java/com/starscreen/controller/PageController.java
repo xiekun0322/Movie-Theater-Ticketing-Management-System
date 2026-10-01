@@ -6,7 +6,9 @@ import com.starscreen.repository.MovieRepository;
 import com.starscreen.repository.OrderRepository;
 import com.starscreen.repository.ScheduleRepository;
 import com.starscreen.service.AdminService;
+import com.starscreen.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ public class PageController {
     @Autowired private MovieRepository movieRepository;
     @Autowired private ScheduleRepository scheduleRepository;
     @Autowired private OrderRepository orderRepository;
+    @Autowired private OrderService orderService;
     @Autowired private AdminService adminService;
 
     @GetMapping("/test")
@@ -30,17 +33,14 @@ public class PageController {
         return "PageController 工作正常";
     }
 
-    /** 首页（支持搜索） */
     @GetMapping("/")
     public String index(@RequestParam(required = false) String keyword, Model model) {
         if (keyword != null && !keyword.trim().isEmpty()) {
-            // 有搜索关键词 → 只显示搜索结果
             List<Movie> searchResults = movieRepository.findByTitleContaining(keyword.trim());
             model.addAttribute("searchResults", searchResults);
             model.addAttribute("keyword", keyword);
             model.addAttribute("isSearching", true);
         } else {
-            // 无关键词 → 显示默认列表
             List<Movie> showingMovies = movieRepository.findByStatus("showing");
             List<Movie> upcomingMovies = movieRepository.findByStatus("upcoming");
             model.addAttribute("showingMovies", showingMovies);
@@ -50,7 +50,6 @@ public class PageController {
         return "index";
     }
 
-    /** 电影详情页 */
     @GetMapping("/movie/detail/{id}")
     public String movieDetail(@PathVariable Long id, Model model) {
         model.addAttribute("movie", movieRepository.findById(id).orElse(null));
@@ -82,15 +81,13 @@ public class PageController {
 
     @GetMapping("/orders")
     public String orders(@RequestParam(required = false, defaultValue = "all") String status,
+                         @RequestParam(defaultValue = "0") int page,
+                         @RequestParam(defaultValue = "10") int size,
                          Model model) {
-        List<com.starscreen.entity.Order> orders;
-        if ("all".equals(status)) {
-            orders = orderRepository.findAllByOrderByIdDesc();
-        } else {
-            orders = orderRepository.findByStatusOrderByIdDesc(status);
-        }
-        model.addAttribute("orders", orders);
+        Page<com.starscreen.entity.Order> orderPage = orderService.listPaged(status, page, size);
+        model.addAttribute("orderPage", orderPage);
         model.addAttribute("currentStatus", status);
+        model.addAttribute("currentPage", page);
         return "orders";
     }
 
@@ -98,5 +95,11 @@ public class PageController {
     public String admin(Model model) {
         model.addAttribute("stats", adminService.getStats());
         return "admin";
+    }
+
+    /** 登录页 */
+    @GetMapping("/login")
+    public String login() {
+        return "login";
     }
 }
