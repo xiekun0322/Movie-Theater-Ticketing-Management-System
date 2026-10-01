@@ -1,12 +1,14 @@
 package com.starscreen.controller;
 
 import com.starscreen.entity.Movie;
+import com.starscreen.entity.Order;
 import com.starscreen.entity.Schedule;
 import com.starscreen.repository.MovieRepository;
 import com.starscreen.repository.OrderRepository;
 import com.starscreen.repository.ScheduleRepository;
 import com.starscreen.service.AdminService;
 import com.starscreen.service.OrderService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -73,18 +75,36 @@ public class PageController {
         return "seat";
     }
 
+    /** 订单详情（校验用户） */
     @GetMapping("/order/{id}")
-    public String orderDetail(@PathVariable Long id, Model model) {
-        model.addAttribute("order", orderRepository.findById(id).orElse(null));
+    public String orderDetail(@PathVariable Long id, Model model, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        Order order = orderRepository.findById(id).orElse(null);
+
+        if (order == null) {
+            return "redirect:/orders";
+        }
+        // 未登录 / 不是自己的订单 → 跳回订单列表
+        if (userId == null || !userId.equals(order.getUserId())) {
+            return "redirect:/orders";
+        }
+
+        model.addAttribute("order", order);
         return "movie-order";
     }
 
+    /** 我的订单列表（只显示当前用户） */
     @GetMapping("/orders")
     public String orders(@RequestParam(required = false, defaultValue = "all") String status,
                          @RequestParam(defaultValue = "0") int page,
                          @RequestParam(defaultValue = "10") int size,
-                         Model model) {
-        Page<com.starscreen.entity.Order> orderPage = orderService.listPaged(status, page, size);
+                         Model model, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        Page<Order> orderPage = orderService.listPagedByUser(userId, status, page, size);
         model.addAttribute("orderPage", orderPage);
         model.addAttribute("currentStatus", status);
         model.addAttribute("currentPage", page);
@@ -97,7 +117,6 @@ public class PageController {
         return "admin";
     }
 
-    /** 登录页 */
     @GetMapping("/login")
     public String login() {
         return "login";

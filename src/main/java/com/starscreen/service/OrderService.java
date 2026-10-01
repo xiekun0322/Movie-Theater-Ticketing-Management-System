@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 public class OrderService {
 
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
-
     private static final int PAY_TIMEOUT_MINUTES = 10;
     private static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Pattern SEAT_LABEL = Pattern.compile("^(\\d+)排(\\d+)座$");
@@ -45,7 +44,8 @@ public class OrderService {
 
     // ==================== 1. 锁座下单 ====================
     @Transactional
-    public Order createOrder(Long scheduleId, List<String> seatLabels) {
+    public Order createOrder(Long userId, Long scheduleId, List<String> seatLabels) {
+        if (userId == null) throw new BusinessException("请先登录");
         if (scheduleId == null) throw new BusinessException("场次 ID 不能为空");
         if (seatLabels == null || seatLabels.isEmpty()) throw new BusinessException("请至少选择一个座位");
         if (seatLabels.size() > MAX_SEATS_PER_ORDER)
@@ -69,6 +69,7 @@ public class OrderService {
 
         Order order = new Order();
         order.setOrderNo(generateOrderNo());
+        order.setUserId(userId);
         order.setScheduleId(scheduleId);
         order.setMovieId(schedule.getMovieId());
         order.setMovieTitle(movie != null ? movie.getTitle() : "未知电影");
@@ -87,16 +88,21 @@ public class OrderService {
         }
         seatRepository.saveAll(seats);
 
-        log.info("创建订单成功：orderNo={}, scheduleId={}, seats={}, totalPrice={}",
-                order.getOrderNo(), scheduleId, seatLabels, order.getTotalPrice());
+        log.info("创建订单成功：orderNo={}, userId={}, scheduleId={}, seats={}, totalPrice={}",
+                order.getOrderNo(), userId, scheduleId, seatLabels, order.getTotalPrice());
         return order;
     }
 
-    // ==================== 2. 支付 ====================
+    // ==================== 2. 支付（校验用户） ====================
     @Transactional
-    public Order pay(Long orderId) {
+    public Order pay(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException("订单不存在"));
+
+        if (userId != null && !userId.equals(order.getUserId())) {
+            throw new BusinessException("无权操作该订单");
+        }
+
         if ("paid".equals(order.getStatus())) {
             log.warn("重复支付被拒绝：orderId={}", orderId);
             throw new BusinessException("订单已支付，请勿重复操作");
@@ -120,11 +126,16 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 3. 取消订单 ====================
+    // ==================== 3. 取消订单（校验用户） ====================
     @Transactional
-    public Order cancel(Long orderId) {
+    public Order cancel(Long userId, Long orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new BusinessException("订单不存在"));
+
+        if (userId != null && !userId.equals(order.getUserId())) {
+            throw new BusinessException("无权操作该订单");
+        }
+
         if ("paid".equals(order.getStatus())) throw new BusinessException("已支付订单不可取消");
         if ("cancelled".equals(order.getStatus())) return order;
 
@@ -136,7 +147,7 @@ public class OrderService {
         return order;
     }
 
-    // ==================== 4. 定时取消超时订单 ====================
+    // ==================== 4. 定时取消超时订单（系统任务，不校验用户） ====================
     @Scheduled(fixedRate = 30_000)
     @Transactional
     public void cancelExpiredOrders() {
@@ -168,18 +179,16 @@ public class OrderService {
     }
 
     // ==================== 查询 ====================
-    public List<Order> listAll() {
-        return orderRepository.findAllByOrderByIdDesc();
-    }
-
-    public List<Order> listByStatus(String status) {
+    /** 分页查询（按用户过滤） */
+    public Page<Order> listPagedByUser(Long userId, String status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         if (status == null || status.isEmpty() || "all".equals(status)) {
-            return orderRepository.findAllByOrderByIdDesc();
+            return orderRepository.findByUserIdOrderByIdDesc(userId, pageable);
         }
-        return orderRepository.findByStatusOrderByIdDesc(status);
+        return orderRepository.findByUserIdAndStatusOrderByIdDesc(userId, status, pageable);
     }
 
-    /** 分页查询（新增） */
+    /** 后台统计用（全部订单） */
     public Page<Order> listPaged(String status, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"));
         if (status == null || status.isEmpty() || "all".equals(status)) {

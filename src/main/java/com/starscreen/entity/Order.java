@@ -15,6 +15,9 @@ public class Order {
     @Column(unique = true, length = 50)
     private String orderNo;
 
+    /** 下单用户 ID（新增） */
+    private Long userId;
+
     private Long scheduleId;
     private Long movieId;
 

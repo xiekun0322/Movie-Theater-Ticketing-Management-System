@@ -139,7 +139,7 @@
                 <div class="movie-detail">
                     <div class="movie-title" th:text="${movie != null ? movie.title : '未知电影'}">电影名</div>
                     <div class="movie-meta">类型：剧情</div>
-                    <div class="movie-meta">时长：95分钟</div>
+                    <div class="movie-meta" th:text="${movie != null and movie.duration != null ? '时长：' + movie.duration + '分钟' : '时长：95分钟'}">时长：95分钟</div>
                 </div>
             </div>
 
@@ -283,6 +283,7 @@
                 }
             }
 
+            // ---------- 提交锁座（含登录检查） ----------
             confirmBtn.addEventListener('click', function () {
                 if (selectedSeats.length === 0) return;
 
@@ -290,17 +291,30 @@
                 confirmBtn.disabled = true;
                 confirmBtn.textContent = '提交中...';
 
+                const payload = {
+                    scheduleId: Number(scheduleId),
+                    seats: selectedSeats.map(s => s.label)
+                };
+
                 fetch('/api/orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        scheduleId: Number(scheduleId),
-                        seats: selectedSeats.map(s => s.label)
-                    })
+                    body: JSON.stringify(payload)
                 })
                 .then(res => res.json())
                 .then(result => {
+                    if (result.code === 401) {
+                        // 未登录
+                        if (confirm('请先登录，是否前往登录页？')) {
+                            window.location.href = '/login';
+                        } else {
+                            confirmBtn.textContent = originalText;
+                            confirmBtn.disabled = false;
+                        }
+                        return;
+                    }
                     if (result.code !== 200) throw new Error(result.message);
+                    // 成功 → 跳转订单详情页
                     window.location.href = '/order/' + result.data.id;
                 })
                 .catch(err => {

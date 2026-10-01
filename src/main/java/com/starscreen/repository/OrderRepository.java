@@ -10,29 +10,24 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    /** 按状态查询（全部） */
+    // ========== 无用户过滤（旧方法，AdminController 等可能用） ==========
     List<Order> findByStatus(String status);
-
-    /** 全部订单，最新在前 */
     List<Order> findAllByOrderByIdDesc();
-
-    /** 按状态查询，最新在前 */
     List<Order> findByStatusOrderByIdDesc(String status);
-
-    /** 分页：全部订单（新增） */
     Page<Order> findAllByOrderByIdDesc(Pageable pageable);
-
-    /** 分页：按状态查询（新增） */
     Page<Order> findByStatusOrderByIdDesc(String status, Pageable pageable);
 
-    /** 统计某状态的订单数 */
+    // ========== 按 userId 过滤（新增） ==========
+    Page<Order> findByUserIdOrderByIdDesc(Long userId, Pageable pageable);
+    Page<Order> findByUserIdAndStatusOrderByIdDesc(Long userId, String status, Pageable pageable);
+    List<Order> findByStatusAndId(String status, Long id);
+
+    // ========== 统计 ==========
     long countByStatus(String status);
 
-    /** 统计已支付订单的总票房 */
     @Query("SELECT COALESCE(SUM(o.totalPrice), 0) FROM Order o WHERE o.status = 'paid'")
     Double sumPaidTotalPrice();
 
-    /** 按电影统计票房 */
     @Query("SELECT o.movieTitle, SUM(o.totalPrice), COUNT(o) " +
            "FROM Order o WHERE o.status = 'paid' " +
            "GROUP BY o.movieTitle " +
