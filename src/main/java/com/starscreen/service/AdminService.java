@@ -1,9 +1,10 @@
 package com.starscreen.service;
 
-import com.starscreen.dto.AdminStats;
-import com.starscreen.repository.OrderRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.starscreen.dto.AdminStats;
+import com.starscreen.repository.OrderRepository;
 
 @Service
 public class AdminService {
