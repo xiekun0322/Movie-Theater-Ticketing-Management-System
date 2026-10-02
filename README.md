@@ -210,4 +210,32 @@ stateDiagram-v2
     locked --> sold : 支付成功
     locked --> available : 超时/取消
     sold --> [*]
+## 📋 下单流程
+
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant C as OrderController
+    participant S as OrderService
+    participant R as Repository
+    participant DB as MySQL
+    
+    U->>C: POST /api/orders
+    Note over C: 从 session 拿 userId
+    C->>S: createOrder(userId, scheduleId, seats)
+    S->>R: 查场次
+    R->>DB: SELECT schedule
+    DB-->>R: schedule
+    R-->>S: schedule
+    S->>R: 查座位
+    R->>DB: SELECT seat
+    DB-->>R: seat
+    S->>S: 校验座位状态
+    S->>R: 创建订单
+    R->>DB: INSERT t_order
+    S->>R: 锁定座位
+    R->>DB: UPDATE seat SET status='locked'
+    S-->>C: Order
+    C-->>U: JSON 响应
+```
 ```
